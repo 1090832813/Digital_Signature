@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- 1. 引入vue -->
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<!-- 2. 引入样式 -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<!-- 3. 引入组件库 -->
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<link rel="stylesheet" href="./css/index.css">
+		<link rel="stylesheet" href="./css/upload.css">
+		<title>Document</title>
+		<style>
+
+		</style>
+	</head>
+
+
+
+	<body>
+		<div id="app">
+			<el-container>
+				<el-header>
+					数字图像保护系统
+				</el-header>
+				<el-container>
+					<el-aside width="200px">
+						<el-col :span="24">
+							<h4>首页</h4>
+							<el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen"
+								@close="handleClose" background-color="#545c64" text-color="#fff"
+								active-text-color="#ffd04b">
+								<el-submenu index="1">
+									<template slot="title">
+										<i class="sel-icon-picture"></i>
+										<span>图片版权管理</span>
+									</template>
+									<el-menu-item-group>
+
+										<el-menu-item index="1-1">图片管理</el-menu-item>
+										<el-menu-item index="1-2">上传图片</el-menu-item>
+									</el-menu-item-group>
+
+								</el-submenu>
+								<el-submenu index="2">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>系统管理</span>
+									</template>
+									<el-menu-item-group>
+										<el-menu-item index="2-1">用户管理</el-menu-item>
+										<el-menu-item index="2-2">注册</el-menu-item>
+										<el-menu-item index="2-3">菜单管理</el-menu-item>
+
+									</el-menu-item-group>
+								</el-submenu>
+								</el-menu-item>
+							</el-menu>
+						</el-col>
+						</el-row>
+					</el-aside>
+					<el-main>
+						<el-breadcrumb separator-class="el-icon-arrow-right">
+							<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+							<el-breadcrumb-item>图片管理</el-breadcrumb-item>
+
+						</el-breadcrumb>
+
+						<el-button size="small" type="primary" @click="handleCreate()">点击上传</el-button>
+						<div id="addpic">
+							<el-dialog title="添加图片" :visible.sync="dialogFormVisible">
+								<el-form  :model="formData" label-width="80px" :rules="rules" ref="forms">
+									<el-form-item label="图片名称" :rules="rules.picture_name" prop="picture_name">
+										<el-input v-model="formData.picture_name"  ></el-input>
+									</el-form-item>
+									<el-form-item label="图片" :rules="rules.picture" prop="picture">
+										<el-upload
+												action="#"
+												list-type="picture-card"
+												:auto-upload="false"
+												:limit="1"
+												:on-change="handlePicturePreview"
+												:on-remove="handleRemove"
+												:on-success="handlePicturePreview"
+												ref="mYupload"
+												:http-request="uploadFile"
+												>
+											<i slot="default" class="el-icon-plus"></i>
+											<div slot="file" slot-scope="{file}">
+												<img
+														class="el-upload-list__item-thumbnail"
+														:src="file.url" alt=""
+												>
+												<span class="el-upload-list__item-actions">
+												<span
+														class="el-upload-list__item-preview"
+														@click="handlePictureCardPreview(file)"
+												>
+												  <i class="el-icon-zoom-in"></i>
+												</span>
+
+												<span
+														v-if="!disabled"
+														class="el-upload-list__item-delete"
+														@click="clearFiles()"
+												>
+												  <i class="el-icon-delete"></i>
+												</span>
+											  </span>
+											</div>
+										</el-upload>
+										<el-dialog :visible.sync="dialogVisible">
+											<img width="100%" :src="dialogImageUrl" alt="">
+										</el-dialog>
+									</el-form-item>
+									<el-form-item>
+										<el-button type="primary" @click="handleEdit()">立即创建</el-button>
+										<el-button @click="dialogFormVisible = false,resetForm()">取消</el-button>
+									</el-form-item>
+								</el-form>.
+							</el-dialog>
+						</div>
+
+						<el-table :data="filelist" stripe style="width: 100%" :model="formData">
+							<el-table-column prop="picture_name" label="名称" width="180">
+							</el-table-column>
+							<el-table-column prop="picture_realname" label="真实名称" width="180">
+							</el-table-column>
+							<el-table-column prop="picture_type" label="类型" width="180">
+							</el-table-column>
+							<el-table-column prop="picture_user" label="用户" width="180">
+							</el-table-column>
+							<el-table-column label="图片" align="center">
+								<templmate slot-scope="scope">
+									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" width="100px"/>
+								</templmate>
+							</el-table-column>
+							<el-table-column prop="createtime" label="创建时间">
+							</el-table-column>
+							<el-table-column  label="功能">
+								<template slot-scope="scope">
+									<el-button type="primary" size="mini" @click="handleDownload(scope.row)">下载</el-button>
+								</template>
+							</el-table-column>
+						</el-table>
+					</el-main>
+				</el-container>
+			</el-container>
+		</div>
+	</body>
+	<script src="./js/axios-0.27.2.js"></script>
+	<script type="text/javascript" src="./js/jquery-3.6.0.js"></script>
+	<script>
+
+		new Vue({
+			el: '#app',
+			data() {
+				return {
+					par:'',
+					filelist: [],
+					formData: {},
+					dialogFormVisible:false,
+					dialogFormVisible4Edit: false,
+					dialogImageUrl:'',
+					dialogVisible:false,
+					disabled:false,
+					rules: {
+						picture_name: [{ required: true, message: '请输入图片名称', trigger: 'blur' }],
+						picture:[{ required: true, message: '请上传图片', trigger: 'blur' }]
+					},
+				}
+			},
+			methods: {
+				handleOpen(key, keyPath) {
+					console.log(key, keyPath);
+
+				},
+				handleClose(key, keyPath) {
+					console.log(key, keyPath);
+				},
+				handlePicturePreview(file) {
+					console.log(file)
+					this.par=file.raw;
+				},
+				handlePreview(file) {
+					console.log(file);
+				},
+				handleRemove(file) {
+					console.log(file)
+				},
+				clearFiles () {
+					this.$refs['mYupload'].clearFiles();
+				},
+				handlePictureCardPreview(file) {
+					this.dialogImageUrl = file.url;
+
+					this.dialogVisible = true;
+				},
+				handleDownload(file) {
+					let f =file.picture_realname+"."+file.picture_type
+					axios.post("/file/download",f,).then((result)=>{
+						var url = (window.document.location.href+"img/"+result.config.data)
+						var that = this
+						var fileName = file.picture_name
+						this.convertUrlToBase64(url).then(function (base64) {
+							var blob = that.convertBase64UrlToBlob(base64); // 转为blob对象
+							// 下载
+							if (that.myBrowser() == "IE") {
+								window.navigator.msSaveBlob(blob, fileName + ".png");
+							} else if (that.myBrowser() == "FF") {
+								window.location.href = url;
+							} else {
+								var a = document.createElement("a");
+								a.download = fileName;
+								a.href = URL.createObjectURL(blob);
+								document.body.appendChild(a)
+								a.click();
+								URL.revokeObjectURL(a.href) // 释放URL 对象
+								document.body.removeChild(a)
+							}
+						});
+					})
+				},
+				// 转换为base64
+				convertUrlToBase64(url) {
+					return new Promise(function (resolve, reject) {
+						var img = new Image();
+						//设置图片跨越，没有跨越cavas会被污染无法画出
+						img.crossOrigin = "Anonymous";
+						img.src = url;
+						img.onload = function () {
+							var canvas = document.createElement("canvas");
+							canvas.width = img.width;
+							canvas.height = img.height;
+							var ctx = canvas.getContext("2d");
+							ctx.drawImage(img, 0, 0, img.width, img.height);
+							var ext = img.src
+									.substring(img.src.lastIndexOf(".") + 1)
+									.toLowerCase();
+							//转换为base64
+							var dataURL = canvas.toDataURL("image/" + ext);
+							var base64 = {
+								dataURL: dataURL,
+								type: "image/" + ext,
+								ext: ext
+							};
+							resolve(base64);
+						};
+					});
+				},
+				// base64转换为blob流
+				convertBase64UrlToBlob(base64) {
+					var parts = base64.dataURL.split(";base64,");
+					var contentType = parts[0].split(":")[1];
+					var raw = window.atob(parts[1]);
+					var rawLength = raw.length;
+					var uInt8Array = new Uint8Array(rawLength);
+					for (var i = 0; i < rawLength; i++) {
+						uInt8Array[i] = raw.charCodeAt(i);
+					}
+					return new Blob([uInt8Array], {
+						type: contentType
+					});
+				},
+				// 判断浏览器
+				myBrowser() {
+						var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+						if (userAgent.indexOf("OPR") > -1) {
+							return "Opera";
+						} //判断是否Opera浏览器 OPR/43.0.2442.991
+						if (userAgent.indexOf("Firefox") > -1) {
+							return "FF";
+						} //判断是否Firefox浏览器  Firefox/51.0
+						if (userAgent.indexOf("Trident") > -1) {
+							return "IE";
+						} //判断是否IE浏览器 Trident/7.0; rv:11.0
+						if (userAgent.indexOf("Edge") > -1) {
+							return "Edge";
+						} //判断是否Edge浏览器 Edge/14.14393
+						if (userAgent.indexOf("Chrome") > -1) {
+							return "Chrome";
+						} // Chrome/56.0.2924.87
+						if (userAgent.indexOf("Safari") > -1) {
+							return "Safari";
+						} //判断是否Safari浏览器 AppleWebKit/534.57.2 Version/5.1.7 Safari/534.57.2
+				},
+
+				init(){
+					axios.get("/file/findAll", this.formData, ).then((result) => {
+
+						this.filelist = result.data
+
+					})
+				},
+				uploadFile(params) {
+					console.log("uploadFile", params);
+					const _file = params.file;
+					// 通过 FormData 对象上传文件
+					var formData = new FormData();
+					formData.append("file", _file);
+					axios.post("/file/upload",formData).then((res)=>{
+						console.log(res.data)
+						this.formData.picture_realname=res.data.split(".")[0]
+						console.log(this.picture_realname)
+						this.formData.picture_type=res.data.split(".")[1]
+
+					})
+
+				},
+				//重置表单
+				resetForm() {
+					this.formData = {};
+					//this.$refs['form'].clearValidate();
+					this.$nextTick(() => {
+						this.$refs.forms.clearValidate()
+					})
+				},
+				//弹出添加窗口
+				handleCreate() {
+					this.resetForm();
+					this.dialogFormVisible = true;
+
+				},
+				handleEdit() {
+
+					const _file = this.par;
+					// 通过 FormData 对象上传文件
+					var formData = new FormData();
+					formData.append("file", _file);
+					axios.post("/file/upload",formData).then((res)=>{
+						console.log(res.data)
+						this.formData.picture_realname=res.data.split(".")[0]
+						console.log(this.picture_realname)
+						this.formData.picture_type=res.data.split(".")[1]
+						console.log(this.formData.picture_type)
+						axios.post("/file/save", this.formData).then((result) => {
+							console.log(result)
+							console.log(this.formData )
+							this.resetForm();
+							this.dialogFormVisible = false;
+							this.clearFiles()
+						});
+					}).then(function (){
+						this.init()
+					})
+
+
+				},
+			},
+			mounted() {
+				this.init();
+			}
+		})
+	</script>
+
+
+</html>
