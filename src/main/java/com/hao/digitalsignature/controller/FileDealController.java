@@ -59,11 +59,14 @@ public class FileDealController {
         // 得到要下载的文件名
         fileName = fileName.substring(0,fileName.length()-1);
 
-//        FilesController  filesController=new FilesController();
-//        filesController.search(fileName);
-//        System.out.println(filesController.search(fileName));
+
 
         try {
+            FilesController  filesController=new FilesController();
+            System.out.println("oname:"+fileName);
+            String[] str =fileName.split(".");
+            System.out.println("name:"+str[0]);
+
             File filep = new File("");
             String filePath = filep.getCanonicalPath();
             // 上传位置
