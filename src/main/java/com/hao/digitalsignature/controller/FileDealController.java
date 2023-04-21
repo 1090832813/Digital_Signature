@@ -1,5 +1,6 @@
 package com.hao.digitalsignature.controller;
 
+import com.hao.digitalsignature.entity.Files;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,10 +57,11 @@ public class FileDealController {
     public static void downFile(@RequestBody String fileName, HttpServletRequest request,
                                 HttpServletResponse response) {
         // 得到要下载的文件名
-        //String fileName = filename.substring(4);
-
         fileName = fileName.substring(0,fileName.length()-1);
-//        fileName="666.jpg";
+
+        FilesController  filesController=new FilesController();
+        filesController.search(fileName);
+        System.out.println(filesController.search(fileName));
 
         try {
             File filep = new File("");
@@ -103,6 +105,7 @@ public class FileDealController {
             in.close();
             // 关闭输出流
             out.close();
+
         } catch (Exception e) {
             System.out.println("error");
         }

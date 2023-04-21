@@ -1,6 +1,8 @@
 package com.hao.digitalsignature.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.DSASign;
 import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.hao.digitalsignature.entity.User;
@@ -46,6 +48,15 @@ public class FilesController {
 //        File file = new File(path+photo.getOriginalFilename());
 //        photo.transferTo(file);
 //    }
+    @GetMapping("file/search")
+    public Object search(String name){
+
+        QueryWrapper<Files> wrapper = new QueryWrapper<>();
+        wrapper.eq("picture_realname", name);
+        Files files = fileMapper.selectOne(wrapper);
+        return files;
+    }
+
     @PutMapping("/file/update")
     public String update(int id,String name){
         Files file = fileMapper.selectById(id);
@@ -60,9 +71,6 @@ public class FilesController {
     @PostMapping("/file/save")
     public String save(@RequestBody Files file){
         System.out.println(file);
-
-
-
         BigInteger back[]=new BigInteger[2];
         int j=0;
         Base64 base64 = new Base64();
