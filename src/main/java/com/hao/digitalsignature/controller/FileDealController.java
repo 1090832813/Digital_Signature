@@ -63,9 +63,10 @@ public class FileDealController {
 
         try {
             FilesController  filesController=new FilesController();
-            System.out.println("oname:"+fileName);
-            String[] str =fileName.split(".");
-            System.out.println("name:"+str[0]);
+//            String[] strs =fileName.split("\\.");
+//            Files files = filesController.search("fabbc4d4-d0d6-4ff8-9402-1bea422f4fcf");
+          System.out.println(filesController.search("fabbc4d4-d0d6-4ff8-9402-1bea422f4fcf"));
+
 
             File filep = new File("");
             String filePath = filep.getCanonicalPath();

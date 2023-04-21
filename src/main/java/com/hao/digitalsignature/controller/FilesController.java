@@ -49,11 +49,11 @@ public class FilesController {
 //        photo.transferTo(file);
 //    }
     @GetMapping("file/search")
-    public Object search(String name){
-
+    public Files search(String name){
         QueryWrapper<Files> wrapper = new QueryWrapper<>();
         wrapper.eq("picture_realname", name);
         Files files = fileMapper.selectOne(wrapper);
+        System.out.println(files);
         return files;
     }
 
