@@ -59,9 +59,9 @@ public class FileDealController {
         // 得到要下载的文件名
         fileName = fileName.substring(0,fileName.length()-1);
 
-        FilesController  filesController=new FilesController();
-        filesController.search(fileName);
-        System.out.println(filesController.search(fileName));
+//        FilesController  filesController=new FilesController();
+//        filesController.search(fileName);
+//        System.out.println(filesController.search(fileName));
 
         try {
             File filep = new File("");
