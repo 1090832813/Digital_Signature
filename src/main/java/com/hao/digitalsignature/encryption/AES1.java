@@ -21,14 +21,14 @@ public class AES1 {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
     private static final String ENCODING = "UTF-8";
-    private static final String PASSWORD = "388f31778f8d7b227170f6ef67028e26"; // 加密秘钥
+//    private static final String PASSWORD = "388f31778f8d7b227170f6ef67028e26"; // 加密秘钥
 
     /**
      * AES加密
      * @param content 明文
      * @return 密文
      */
-    public static String encryptAES(String content) throws Exception {
+    public static String encryptAES(String content,String PASSWORD) throws Exception {
         if (StringUtils.isEmpty(content)) {
             throw new Exception("明文不能为空！");
         }
@@ -44,7 +44,7 @@ public class AES1 {
      * @param encryptResultStr 密文
      * @return 明文
      */
-    public static String decryptAES(String encryptResultStr) throws Exception {
+    public static String decryptAES(String encryptResultStr,String PASSWORD) throws Exception {
         if (StringUtils.isEmpty(encryptResultStr)) {
             throw new Exception("密文不能为空");
         }
@@ -191,10 +191,10 @@ public class AES1 {
         System.out.println("加密解密");
         String content = "7424862e-ec4b-455c-95f1-f7f4cdcf3588";
         System.out.println("原内容为：" + content);
-        String encryContent = encryptAES(content);
-        System.out.println("加密后的内容为：" + encryContent);
-        String decryContent = decryptAES(encryContent);
-        System.out.println("解密后的内容为：" + decryContent);
+//        String encryContent = encryptAES(content);
+//        System.out.println("加密后的内容为：" + encryContent);
+//        String decryContent = decryptAES(encryContent);
+       // System.out.println("解密后的内容为：" + decryContent);
     }
 
 }

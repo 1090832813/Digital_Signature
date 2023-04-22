@@ -12,7 +12,7 @@ public class AESmiyao {
     /**
      * 随机生成秘钥
      */
-    public static void getKey() {
+    public static String getKey() {
         try {
             KeyGenerator kg = KeyGenerator.getInstance("AES");
             kg.init(128);
@@ -23,10 +23,12 @@ public class AESmiyao {
             System.out.println(s);
             System.out.println("十六进制密钥长度为"+s.length());
             System.out.println("二进制密钥的长度为"+s.length()*4);
+            return s;
         }
         catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             System.out.println("没有此算法。");
+            return "error";
         }
     }
     /**

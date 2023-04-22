@@ -100,7 +100,7 @@ public class DSASign {
         //对消息摘要进行签名得到r和s,在使用RSA进行加密并发送
         for (int i =0;i< sig.length;i++){
         System.out.println("签名:"+sig[i].toString());
-         back[i]= new BigInteger(RSAEncrypt.RSA(sig[i].toString()));
+         back[i]= new BigInteger(RSAEncrypt.RSAen(sig[i].toString()));
         }
         System.out.println("\n需要解密的信息:"+back[0]);
         System.out.println("           "+back[1]);

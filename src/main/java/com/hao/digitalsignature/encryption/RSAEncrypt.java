@@ -331,17 +331,10 @@ public class RSAEncrypt {
         }
         return stringBuilder.toString();
     }
-    public static String RSA(String key) throws Exception {
-        String publicPath = "C:\\Users\\10908"; //公匙存放位置
-        String privatePath = "C:\\Users\\10908"; //私匙存放位置
-
+    public static String RSAde(byte[] cipherData) throws Exception {
+        String publicPath = "C:\\Users\\w10"; //公匙存放位置
+        String privatePath = "C:\\Users\\w10"; //私匙存放位置
         Base64 base64 = new Base64();
-
-
-        String signKey = key;
-        // 公钥加密过程
-        byte[] cipherData = RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(publicPath)),
-                signKey.getBytes());
         String cipher = new String(base64.encode(cipherData));
         // 私钥解密过程
         byte[] res = RSAEncrypt.decrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(privatePath)),
@@ -353,15 +346,25 @@ public class RSAEncrypt {
 //        System.out.println();
         return restr;
     }
+    public static byte[] RSAen(String key) throws Exception {
+        String publicPath = "C:\\Users\\w10"; //公匙存放位置
+        String privatePath = "C:\\Users\\w10"; //私匙存放位置
+        Base64 base64 = new Base64();
+        String signKey = key;
+        // 公钥加密过程
+        byte[] cipherData = RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(publicPath)),
+                signKey.getBytes());
+        return cipherData;
+    }
     public static void main(String[] args) throws Exception {
-        String publicPath = "C:\\Users\\10908"; //公匙存放位置
-        String privatePath = "C:\\Users\\10908"; //私匙存放位置
+        String publicPath = "C:\\Users\\w10"; //公匙存放位置
+        String privatePath = "C:\\Users\\w10"; //私匙存放位置
 
         Base64 base64 = new Base64();
 
         System.out.println("--------------公钥加密私钥解密过程-------------------");
 
-        String signKey = "469468403832192271371540108180328462414842553340";
+        String signKey = "92743764462052142627293439435630995500413457934;675096046721824647030786244037909370416702721699;NDY5QTI5NkIzOUYxQzU3NkJCREYzRjgyRUJCMEU1MDg5OTVEMEUxMUU4MDczRDk3QThGRDUxRkJCMzhBNDIyQTUyNjRDNzU2NDA3REI1N0UzNDlBQjlDM0M3NzFFMDQw;2023-04-22 12:16:23;\n";
         // 公钥加密过程
         byte[] cipherData = RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(publicPath)),
                 signKey.getBytes());

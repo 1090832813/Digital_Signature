@@ -1,6 +1,12 @@
 package com.hao.digitalsignature.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hao.digitalsignature.encryption.AES1;
+import com.hao.digitalsignature.encryption.AESmiyao;
+import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.hao.digitalsignature.entity.Files;
+import com.hao.digitalsignature.mapper.FileMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,11 +22,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.net.URLEncoder;
-import java.util.UUID;
+import java.util.*;
 
 @RequestMapping("/file")
 @RestController
 public class FileDealController {
+
+
+    @Autowired
+    private FileMapper fileMapper;
+
     @RequestMapping(value = "upload")
     public String upload(@RequestParam("file") MultipartFile pic) throws SocketException, IOException {
         String newName = "";
@@ -54,20 +65,47 @@ public class FileDealController {
      * @return
      */
     @RequestMapping(value = "download")
-    public static void downFile(@RequestBody String fileName, HttpServletRequest request,
+    public void downFile(@RequestBody String fileName, HttpServletRequest request,
                                 HttpServletResponse response) {
         // 得到要下载的文件名
         fileName = fileName.substring(0,fileName.length()-1);
-
-
-
         try {
-            FilesController  filesController=new FilesController();
-//            String[] strs =fileName.split("\\.");
-//            Files files = filesController.search("fabbc4d4-d0d6-4ff8-9402-1bea422f4fcf");
-          System.out.println(filesController.search("fabbc4d4-d0d6-4ff8-9402-1bea422f4fcf"));
+            //获取摘要
+            QueryWrapper<Files> wrapper = new QueryWrapper<>();
+            wrapper.eq("picture_realname", fileName.split("\\.")[0]);
+            Files files = fileMapper.selectOne(wrapper);
+            System.out.println("摘要："+files.getDig().split(";")[2]);
+
+            List<String> dig=new ArrayList<String>(Arrays.asList(files.getDig().split(";")));
+            dig.add(files.getCreatetime());
+            String[] dig1=new String[dig.size()];
+            dig.toArray(dig1);
+            for(int i=0;i<dig1.length;i++)
+            System.out.println("正确签名和时间戳"+dig1[i]);
+            //生成AES密钥
+            String aesPassword =AESmiyao.getKey();
+            //AES加密
+            String encryContent= AES1.encryptAES(files.getDig().split(";")[2],aesPassword);
+            //对称加密后的签名
+            dig1[2]=encryContent;
+            for(int i=0;i<dig1.length;i++)
+            System.out.println("加密摘要的签名和时间戳"+dig1[i]);
+            //发送RSA
+            System.out.println(Arrays.toString(dig1));
+            String rsaMsg=new String();
+            for(int i=0;i<dig1.length;i++){
+                rsaMsg+=dig1[i];
+                rsaMsg+=";";
+            }
+            byte[] rsaEn=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()-1));
+            //RSA解密
+            String rsaDe=RSAEncrypt.RSAde(rsaEn);
 
 
+
+
+
+            //下载图片
             File filep = new File("");
             String filePath = filep.getCanonicalPath();
             // 上传位置
@@ -89,7 +127,6 @@ public class FileDealController {
            // response.setContentType("image/png");
             response.setHeader("Content-Disposition", "attachment;filename="
                     + URLEncoder.encode(realname, "UTF-8"));
-
             // 读取要下载的文件，保存到文件输入流
             FileInputStream in = new FileInputStream(fileSaveRootPath + "\\" + fileName);
            // response.setHeader("Location",);
@@ -98,12 +135,10 @@ public class FileDealController {
             // 创建缓冲区
             byte buffer[] = new byte[1024];
             int len = 0;
-
             // 循环将输入流中的内容读取到缓冲区当中
             while ((len = in.read(buffer)) > 0) {
                 // 输出缓冲区的内容到浏览器，实现文件下载
                 out.write(buffer, 0, len);
-
             }
             // 关闭文件输入流
             in.close();
