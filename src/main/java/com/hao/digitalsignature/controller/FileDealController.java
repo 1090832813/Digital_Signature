@@ -3,6 +3,7 @@ package com.hao.digitalsignature.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.AES1;
 import com.hao.digitalsignature.encryption.AESmiyao;
+import com.hao.digitalsignature.encryption.DownloadMsg;
 import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.hao.digitalsignature.entity.Files;
 import com.hao.digitalsignature.mapper.FileMapper;
@@ -13,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.SocketException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -70,36 +68,7 @@ public class FileDealController {
         // 得到要下载的文件名
         fileName = fileName.substring(0,fileName.length()-1);
         try {
-            //获取摘要
-            QueryWrapper<Files> wrapper = new QueryWrapper<>();
-            wrapper.eq("picture_realname", fileName.split("\\.")[0]);
-            Files files = fileMapper.selectOne(wrapper);
-            System.out.println("摘要："+files.getDig().split(";")[2]);
 
-            List<String> dig=new ArrayList<String>(Arrays.asList(files.getDig().split(";")));
-            dig.add(files.getCreatetime());
-            String[] dig1=new String[dig.size()];
-            dig.toArray(dig1);
-            for(int i=0;i<dig1.length;i++)
-            System.out.println("正确签名和时间戳"+dig1[i]);
-            //生成AES密钥
-            String aesPassword =AESmiyao.getKey();
-            //AES加密
-            String encryContent= AES1.encryptAES(files.getDig().split(";")[2],aesPassword);
-            //对称加密后的签名
-            dig1[2]=encryContent;
-            for(int i=0;i<dig1.length;i++)
-            System.out.println("加密摘要的签名和时间戳"+dig1[i]);
-            //发送RSA
-            System.out.println(Arrays.toString(dig1));
-            String rsaMsg=new String();
-            for(int i=0;i<dig1.length;i++){
-                rsaMsg+=dig1[i];
-                rsaMsg+=";";
-            }
-            byte[] rsaEn=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()-1));
-            //RSA解密
-            String rsaDe=RSAEncrypt.RSAde(rsaEn);
 
 
 
@@ -123,8 +92,7 @@ public class FileDealController {
             }
             // 处理文件名
             String realname = fileName.substring(fileName.indexOf("_") + 1);
-            // 设置响应头，控制浏览器下载该文件
-           // response.setContentType("image/png");
+
             response.setHeader("Content-Disposition", "attachment;filename="
                     + URLEncoder.encode(realname, "UTF-8"));
             // 读取要下载的文件，保存到文件输入流
@@ -146,6 +114,57 @@ public class FileDealController {
             out.close();
 
         } catch (Exception e) {
+            System.out.println("error");
+        }
+    }
+
+
+    @RequestMapping(value = "/downloadMsg")
+    public void exportKtrAndKjb(@RequestBody String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        fileName = fileName.substring(0,fileName.length()-1);
+
+        //获取摘要
+        try {
+
+        QueryWrapper<Files> wrapper = new QueryWrapper<>();
+        wrapper.eq("picture_realname", fileName.split("\\.")[0]);
+        Files files = fileMapper.selectOne(wrapper);
+        System.out.println("文件对象："+files);
+        System.out.println("摘要："+files.getDig().split(";")[2]);
+
+        List<String> dig=new ArrayList<String>(Arrays.asList(files.getDig().split(";")));
+        dig.add(files.getCreatetime());
+        String[] dig1=new String[dig.size()];
+        dig.toArray(dig1);
+        for(int i=0;i<dig1.length;i++)
+            System.out.println("正确签名和时间戳"+dig1[i]);
+        //生成AES密钥
+        String aesPassword =AESmiyao.getKey();
+        //AES加密
+        String encryContent= AES1.encryptAES(files.getDig().split(";")[2],aesPassword);
+        //对称加密后的签名
+        dig1[2]=encryContent;
+        for(int i=0;i<dig1.length;i++)
+            System.out.println("加密摘要的签名和时间戳"+dig1[i]);
+        //发送RSA
+        System.out.println(Arrays.toString(dig1));
+        String rsaMsg=new String();
+        for(int i=0;i<dig1.length;i++){
+            rsaMsg+=dig1[i];
+            rsaMsg+=";";
+        }
+            System.out.println(rsaMsg.length());
+        byte[] rsaEnf=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()/2));
+        byte[] rsaEns=RSAEncrypt.RSAen(rsaMsg.substring(rsaMsg.length()/2));
+
+        //RSA解密
+        String rsaDef=RSAEncrypt.RSAde(rsaEnf);
+        String rsaDes=RSAEncrypt.RSAde(rsaEns);
+        String recRes=rsaDef+rsaDes;
+
+       DownloadMsg.downloadByStringContent(request, response, fileName.split("\\.")[0], recRes);
+
+        }catch (Exception e) {
             System.out.println("error");
         }
     }
