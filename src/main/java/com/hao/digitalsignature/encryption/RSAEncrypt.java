@@ -340,10 +340,7 @@ public class RSAEncrypt {
         byte[] res = RSAEncrypt.decrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(privatePath)),
                 base64.decode(cipher));
         String restr = new String(res);
-//        System.out.println("原文：" + signKey);
-//        System.out.println("加密：" + cipher);
-//        System.out.println("解密：" + restr);
-//        System.out.println();
+
         return restr;
     }
     public static byte[] RSAen(String key) throws Exception {
