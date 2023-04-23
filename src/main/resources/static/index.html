@@ -226,34 +226,7 @@
 					})
 					axios.post("/file/downloadMsg",f,).then((res)=>{
 						console.log(res)
-						// var url = (window.document.location.href+"img/"+res.config.data)
-						// var a = document.createElement("a");
-						// a.download = file.picture_name;
-						// a.href = URL.createObjectURL(blob);
-						// document.body.appendChild(a)
-						// a.click();
-						// URL.revokeObjectURL(a.href) // 释放URL 对象
-						// document.body.removeChild(a)
-						// var url = (window.document.location.href+"img/"+res.config.data)
-						// var that = this
-						// var fileName = file.picture_name
-						// this.convertUrlToBase64(url).then(function (base64) {
-						// 	var blob = that.convertBase64UrlToBlob(base64); // 转为blob对象
-						// 	// 下载
-						// 	if (that.myBrowser() == "IE") {
-						// 		window.navigator.msSaveBlob(blob, fileName + ".txt");
-						// 	} else if (that.myBrowser() == "FF") {
-						// 		window.location.href = url;
-						// 	} else {
-						// 		var a = document.createElement("a");
-						// 		a.download = fileName;
-						// 		a.href = URL.createObjectURL(blob);
-						// 		document.body.appendChild(a)
-						// 		a.click();
-						// 		URL.revokeObjectURL(a.href) // 释放URL 对象
-						// 		document.body.removeChild(a)
-						// 	}
-						// });
+
 						this.downloadFile(res.data,file.picture_name)
 					})
 				},

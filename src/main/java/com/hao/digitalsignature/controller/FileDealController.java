@@ -161,7 +161,7 @@ public class FileDealController {
         String rsaDef=RSAEncrypt.RSAde(rsaEnf);
         String rsaDes=RSAEncrypt.RSAde(rsaEns);
         String recRes=rsaDef+rsaDes;
-
+            System.out.println('6');
        DownloadMsg.downloadByStringContent(request, response, fileName.split("\\.")[0], recRes);
 
         }catch (Exception e) {

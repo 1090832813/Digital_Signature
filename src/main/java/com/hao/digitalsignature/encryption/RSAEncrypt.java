@@ -332,8 +332,8 @@ public class RSAEncrypt {
         return stringBuilder.toString();
     }
     public static String RSAde(byte[] cipherData) throws Exception {
-        String publicPath = "C:\\Users\\w10"; //公匙存放位置
-        String privatePath = "C:\\Users\\w10"; //私匙存放位置
+        String publicPath = "C:\\Users\\10908"; //公匙存放位置
+        String privatePath = "C:\\Users\\10908"; //私匙存放位置
         Base64 base64 = new Base64();
         String cipher = new String(base64.encode(cipherData));
         // 私钥解密过程
@@ -347,8 +347,8 @@ public class RSAEncrypt {
         return restr;
     }
     public static byte[] RSAen(String key) throws Exception {
-        String publicPath = "C:\\Users\\w10"; //公匙存放位置
-        String privatePath = "C:\\Users\\w10"; //私匙存放位置
+        String publicPath = "C:\\Users\\10908"; //公匙存放位置
+        String privatePath = "C:\\Users\\10908"; //私匙存放位置
         Base64 base64 = new Base64();
         String signKey = key;
         // 公钥加密过程
