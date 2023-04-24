@@ -69,11 +69,6 @@ public class FileDealController {
         fileName = fileName.substring(0,fileName.length()-1);
         try {
 
-
-
-
-
-
             //下载图片
             File filep = new File("");
             String filePath = filep.getCanonicalPath();

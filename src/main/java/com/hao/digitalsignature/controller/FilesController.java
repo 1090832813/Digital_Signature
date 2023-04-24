@@ -76,6 +76,16 @@ public class FilesController {
         else
             return "fail";
     }
+
+    @PostMapping(value="/file/verify")
+    public String verify(@RequestBody String  file){
+        String[] str = file.substring(1,file.length()-1).split(";");
+//        str[3];
+
+        return "0";
+    }
+
+
     @GetMapping("/file/findAll")
     public List<Files> find(){
         return  fileMapper.selectList(null);

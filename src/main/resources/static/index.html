@@ -35,10 +35,10 @@
 								@close="handleClose" background-color="#545c64" text-color="#fff"
 								active-text-color="#ffd04b">
 								<el-submenu index="1">
-									<template slot="title">
+									<div slot="title">
 										<i class="sel-icon-picture"></i>
 										<span>图片版权管理</span>
-									</template>
+									</div>
 									<el-menu-item-group>
 
 										<el-menu-item index="1-1">图片管理</el-menu-item>
@@ -47,10 +47,10 @@
 
 								</el-submenu>
 								<el-submenu index="2">
-									<template slot="title">
+									<div slot="title">
 										<i class="el-icon-menu"></i>
 										<span>系统管理</span>
-									</template>
+									</div>
 									<el-menu-item-group>
 										<el-menu-item index="2-1">用户管理</el-menu-item>
 										<el-menu-item index="2-2">注册</el-menu-item>
@@ -83,9 +83,7 @@
 												list-type="picture-card"
 												:auto-upload="false"
 												:limit="1"
-												:on-change="handlePicturePreview"
-												:on-remove="handleRemove"
-												:on-success="handlePicturePreview"
+												accept="image/png, image/jpeg"
 												ref="mYupload"
 												:http-request="uploadFile"
 												>
@@ -126,34 +124,47 @@
 						</div>
 
 						<el-table :data="filelist" stripe style="width: 100%" :model="formData">
-							<el-table-column prop="picture_name" label="名称" width="180">
+							<el-table-column prop="picture_name" label="名称" width="120">
 							</el-table-column>
 							<el-table-column prop="picture_realname" label="真实名称" width="180">
 							</el-table-column>
-							<el-table-column prop="picture_type" label="类型" width="180">
+							<el-table-column prop="picture_type" label="类型" width="50">
 							</el-table-column>
-							<el-table-column prop="picture_user" label="用户" width="180">
+							<el-table-column prop="picture_user" label="用户" width="100">
 							</el-table-column>
 							<el-table-column label="图片" align="center">
-								<templmate slot-scope="scope">
-									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" width="100px"/>
-								</templmate>
+								<div slot-scope="scope">
+									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" width="100px" onerror="this.src='./img/丢失.jpg;this.οnerrοr=null'"/>
+								</div>
 							</el-table-column>
 							<el-table-column prop="createtime" label="创建时间">
 							</el-table-column>
-							<el-table-column  label="功能">
-								<template slot-scope="scope">
+							<el-table-column  label="功能" width="180">
+								<div slot-scope="scope" style="display: flex;justify-content: space-around">
 									<el-button type="primary" size="mini" @click="handleDownload(scope.row)">下载</el-button>
-								</template>
+									<el-upload
+											class="upload-demo"
+											action="#"
+											:on-change="(file) => {openFile(file, scope.row)}"
+											:auto-upload="false"
+											:show-file-list="false"
+											accept="text/plain"
+											:limit="1"
+											:file-list="verifyList">
+										<el-button size="small" type="primary">验证</el-button>
+									</el-upload>
+
+								</div>
 							</el-table-column>
+							<el-empty description="描述文字"></el-empty>
 						</el-table>
 						<div class="block">
 							<el-pagination
 									@size-change="handleSizeChange"
 									@current-change="handleCurrentChange"
-									:current-page="currentPage4"
-									:page-sizes="[10, 20, 30]"
-									:page-size="10"
+									:current-page="currentPage1"
+									:page-sizes="[5, 10]"
+									:page-size="5"
 									layout="total, sizes, prev, pager, next, jumper"
 									:total="10">
 							</el-pagination>
@@ -173,6 +184,8 @@
 				return {
 					par:'',
 					filelist: [],
+					verify:{},
+					verifyList:[],
 					formData: {},
 					dialogFormVisible:false,
 					dialogFormVisible4Edit: false,
@@ -325,21 +338,28 @@
 
 					})
 				},
-				uploadFile(params) {
-					console.log("uploadFile", params);
-					const _file = params.file;
-					// 通过 FormData 对象上传文件
-					var formData = new FormData();
-					formData.append("file", _file);
-					axios.post("/file/upload",formData).then((res)=>{
-						console.log(res.data)
-						this.formData.picture_realname=res.data.split(".")[0]
-						console.log(this.picture_realname)
-						this.formData.picture_type=res.data.split(".")[1]
-
-					})
-
-				},
+				// uploadFile(params) {
+				// 	console.log("uploadFile", params);
+				// 	console.log("par:", this.par);
+				// 	const _file = params.file;
+				// 	// 通过 FormData 对象上传文件
+				// 	var formData = new FormData();
+				// 	formData.append("file", _file);
+				// 	console.log("data:"+this.formData)
+				// 	if(params.file.type!="text/plain") {
+				// 		axios.post("/file/upload", formData).then((res) => {
+				// 			console.log(res.data)
+				// 			this.formData.picture_realname = res.data.split(".")[0]
+				// 			console.log(this.picture_realname)
+				// 			this.formData.picture_type = res.data.split(".")[1]
+				//
+				// 		})
+				// 	}else{
+				// 		axios.post("/file/verify", formData).then((res) => {
+				// 			console.log(res)
+				// 		})
+				// 	}
+				// },
 				//重置表单
 				resetForm() {
 					this.formData = {};
@@ -352,10 +372,27 @@
 				handleCreate() {
 					this.resetForm();
 					this.dialogFormVisible = true;
-
+				},
+				handleVerify() {
+					this.resetForm();
+					this.dialogFormVisible4Edit = true;
+				},
+				openFile(file,name) {
+					//验证的文件
+					console.log(name.picture_name)
+					var reader = new FileReader();
+					reader.onload = function () {
+						if (reader.result) {
+							//打印文件内容
+							console.log(reader.result);
+							axios.post("/file/verify", reader.result,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
+								console.log(res)
+							})
+						}
+					};
+					reader.readAsText(file.raw);
 				},
 				handleEdit() {
-
 					const _file = this.par;
 					// 通过 FormData 对象上传文件
 					var formData = new FormData();
@@ -366,6 +403,7 @@
 						console.log(this.picture_realname)
 						this.formData.picture_type=res.data.split(".")[1]
 						console.log(this.formData.picture_type)
+						console.log(this.formData)
 						axios.post("/file/save", this.formData).then((result) => {
 							console.log(result)
 							console.log(this.formData )
