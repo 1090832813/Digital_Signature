@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
+
 import java.util.List;
 
 @RestController
@@ -78,8 +80,18 @@ public class FilesController {
     }
 
     @PostMapping(value="/file/verify")
-    public String verify(@RequestBody String  file){
-        String[] str = file.substring(1,file.length()-1).split(";");
+    public String verify(@RequestBody String obj){
+
+      String[] str = obj.substring(1,obj.length()-1).split(";");
+      for(int i =0;i<str.length;i++)
+          System.out.println(str[i]);
+        Files file = fileMapper.selectById(str[0]);
+        System.out.println(file);
+        if(file.getCreatetime().equals( str[4])){
+            System.out.println("success");
+        }else {
+            System.out.println("failed");
+        }
 //        str[3];
 
         return "0";

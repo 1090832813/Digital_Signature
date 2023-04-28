@@ -148,7 +148,7 @@ public class FileDealController {
             rsaMsg+=dig1[i];
             rsaMsg+=";";
         }
-            System.out.println(rsaMsg.length());
+            System.out.println(rsaMsg);
         byte[] rsaEnf=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()/2));
         byte[] rsaEns=RSAEncrypt.RSAen(rsaMsg.substring(rsaMsg.length()/2));
 

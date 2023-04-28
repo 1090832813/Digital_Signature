@@ -23,3 +23,7 @@
     display: block;
 }
 .el-icon--right {}
+.block{
+    display: flex;
+    justify-content: center;
+}

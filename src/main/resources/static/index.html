@@ -85,6 +85,9 @@
 												:limit="1"
 												accept="image/png, image/jpeg"
 												ref="mYupload"
+												:on-change="handlePicturePreview"
+												:on-remove="handleRemove"
+												:on-success="handlePicturePreview"
 												:http-request="uploadFile"
 												>
 											<i slot="default" class="el-icon-plus"></i>
@@ -123,7 +126,7 @@
 							</el-dialog>
 						</div>
 
-						<el-table :data="filelist" stripe style="width: 100%" :model="formData">
+						<el-table :data="filelist.slice((currentPage-1)*PageSize,currentPage*PageSize)" stripe style="width: 100%" :model="formData">
 							<el-table-column prop="picture_name" label="名称" width="120">
 							</el-table-column>
 							<el-table-column prop="picture_realname" label="真实名称" width="180">
@@ -156,17 +159,17 @@
 
 								</div>
 							</el-table-column>
-							<el-empty description="描述文字"></el-empty>
+							<el-empty description="暂无信息"></el-empty>
 						</el-table>
 						<div class="block">
 							<el-pagination
 									@size-change="handleSizeChange"
 									@current-change="handleCurrentChange"
-									:current-page="currentPage1"
-									:page-sizes="[5, 10]"
-									:page-size="5"
+									:current-page="currentPage"
+									:page-sizes="pageSizes"
+									:page-size="PageSize"
 									layout="total, sizes, prev, pager, next, jumper"
-									:total="10">
+									:total="totalCount">
 							</el-pagination>
 						</div>
 					</el-main>
@@ -192,6 +195,14 @@
 					dialogImageUrl:'',
 					dialogVisible:false,
 					disabled:false,
+                    // 默认显示第几页
+                    currentPage:1,
+                    // 总条数，根据接口获取数据长度(注意：这里不能为空)
+                    totalCount:1,
+                    // 个数选择器（可修改）
+                    pageSizes:[3,5,10],
+                    // 默认每页显示的条数（可修改）
+                    PageSize:3,
 					rules: {
 						picture_name: [{ required: true, message: '请输入图片名称', trigger: 'blur' }],
 						picture:[{ required: true, message: '请上传图片', trigger: 'blur' }]
@@ -199,6 +210,18 @@
 				}
 			},
 			methods: {
+                // 每页显示的条数
+                handleSizeChange(val) {
+                    // 改变每页显示的条数
+                    this.PageSize=val
+                    // 注意：在改变每页显示的条数时，要将页码显示到第一页
+                    this.currentPage=1
+                },
+                // 显示第几页
+                handleCurrentChange(val) {
+                    // 改变默认的页数
+                    this.currentPage=val
+                },
 				handleOpen(key, keyPath) {
 					console.log(key, keyPath);
 
@@ -335,7 +358,7 @@
 					axios.get("/file/findAll", this.formData, ).then((result) => {
 
 						this.filelist = result.data
-
+                        this.totalCount=result.data.length
 					})
 				},
 				// uploadFile(params) {
@@ -385,7 +408,9 @@
 						if (reader.result) {
 							//打印文件内容
 							console.log(reader.result);
-							axios.post("/file/verify", reader.result,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
+							var p= name.picture_id+';'+ reader.result
+
+							axios.post("/file/verify", p,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
 								console.log(res)
 							})
 						}
