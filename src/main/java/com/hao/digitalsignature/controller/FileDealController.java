@@ -5,7 +5,9 @@ import com.hao.digitalsignature.encryption.AES1;
 import com.hao.digitalsignature.encryption.AESmiyao;
 import com.hao.digitalsignature.encryption.DownloadMsg;
 import com.hao.digitalsignature.encryption.RSAEncrypt;
+import com.hao.digitalsignature.entity.Download;
 import com.hao.digitalsignature.entity.Files;
+import com.hao.digitalsignature.mapper.DownloadMapper;
 import com.hao.digitalsignature.mapper.FileMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,9 @@ public class FileDealController {
 
     @Autowired
     private FileMapper fileMapper;
+
+    @Autowired
+    private DownloadMapper downloadMapper;
 
     @RequestMapping(value = "upload")
     public String upload(@RequestParam("file") MultipartFile pic) throws SocketException, IOException {
@@ -135,6 +140,14 @@ public class FileDealController {
             System.out.println("正确签名和时间戳"+dig1[i]);
         //生成AES密钥
         String aesPassword =AESmiyao.getKey();
+        if(files.getPicture_realname()!=null){
+            Download download=new Download(0,files.getPicture_realname(),aesPassword);
+            System.out.println(download);
+            downloadMapper.insert(download);
+            System.out.println("成功");
+        }else{
+            System.out.println("有了");
+        }
         //AES加密
         String encryContent= AES1.encryptAES(files.getDig().split(";")[2],aesPassword);
         //对称加密后的签名
@@ -156,7 +169,7 @@ public class FileDealController {
         String rsaDef=RSAEncrypt.RSAde(rsaEnf);
         String rsaDes=RSAEncrypt.RSAde(rsaEns);
         String recRes=rsaDef+rsaDes;
-            System.out.println('6');
+
        DownloadMsg.downloadByStringContent(request, response, fileName.split("\\.")[0], recRes);
 
         }catch (Exception e) {

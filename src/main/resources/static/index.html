@@ -89,6 +89,7 @@
 												:on-remove="handleRemove"
 												:on-success="handlePicturePreview"
 												:http-request="uploadFile"
+												:before-upload="beforeAvatarUpload"
 												>
 											<i slot="default" class="el-icon-plus"></i>
 											<div slot="file" slot-scope="{file}">
@@ -97,30 +98,56 @@
 														:src="file.url" alt=""
 												>
 												<span class="el-upload-list__item-actions">
-												<span
-														class="el-upload-list__item-preview"
-														@click="handlePictureCardPreview(file)"
-												>
-												  <i class="el-icon-zoom-in"></i>
-												</span>
+													<span
+															class="el-upload-list__item-preview"
+															@click="handlePictureCardPreview(file)"
+													>
+													  <i class="el-icon-zoom-in"></i>
+													</span>
 
-												<span
-														v-if="!disabled"
-														class="el-upload-list__item-delete"
-														@click="clearFiles()"
-												>
-												  <i class="el-icon-delete"></i>
-												</span>
-											  </span>
+													<span
+															v-if="!disabled"
+															class="el-upload-list__item-delete"
+															@click="clearFiles()"
+													>
+													  <i class="el-icon-delete"></i>
+													</span>
+											  	</span>
 											</div>
 										</el-upload>
-										<el-dialog :visible.sync="dialogVisible">
-											<img width="100%" :src="dialogImageUrl" alt="">
-										</el-dialog>
+
 									</el-form-item>
 									<el-form-item>
 										<el-button type="primary" @click="handleEdit()">立即创建</el-button>
 										<el-button @click="dialogFormVisible = false,resetForm()">取消</el-button>
+									</el-form-item>
+								</el-form>.
+							</el-dialog>
+							<el-dialog :visible.sync="dialogVisible">
+								<img width="100%" :src="dialogImageUrl" alt="">
+							</el-dialog>
+							<el-dialog title="解密签名" :visible.sync="dialogFormVisible2">
+								<el-form  :model="formData" label-width="80px" :rules="rules" ref="dforms">
+									<el-form-item label="AES密钥" :rules="rules.AES" prop="AES">
+										<el-input v-model="formData.AES"  ></el-input>
+									</el-form-item>
+									<el-form-item label="签名文件" :rules="rules.dig" prop="dig">
+										<el-upload
+												class="digFile"
+												action="#"
+												:auto-upload="false"
+												accept="text/plain"
+												:limit="1"
+												:file-list="digList"
+												:on-change="uploadDig"
+												ref="myDig"
+										>
+											<el-button size="small" type="primary">上传签名文件</el-button>
+										</el-upload>
+									</el-form-item>
+									<el-form-item>
+										<el-button type="primary" @click="handleEncryptionDig()">立即解密</el-button>
+										<el-button @click="dialogFormVisible2 = false,resetDig()">取消</el-button>
 									</el-form-item>
 								</el-form>.
 							</el-dialog>
@@ -137,14 +164,15 @@
 							</el-table-column>
 							<el-table-column label="图片" align="center">
 								<div slot-scope="scope">
-									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" width="100px" onerror="this.src='./img/丢失.jpg;this.οnerrοr=null'"/>
+									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" @click="handlePictureCardPreviewTable(scope.row)" width="100px" onerror="this.src='./img/丢失.jpg;this.οnerrοr=null'"/>
 								</div>
 							</el-table-column>
 							<el-table-column prop="createtime" label="创建时间">
 							</el-table-column>
-							<el-table-column  label="功能" width="180">
+							<el-table-column  label="功能" width="300">
 								<div slot-scope="scope" style="display: flex;justify-content: space-around">
 									<el-button type="primary" size="mini" @click="handleDownload(scope.row)">下载</el-button>
+
 									<el-upload
 											class="upload-demo"
 											action="#"
@@ -153,10 +181,12 @@
 											:show-file-list="false"
 											accept="text/plain"
 											:limit="1"
-											:file-list="verifyList">
-										<el-button size="small" type="primary">验证</el-button>
+											:file-list="verifyList"
+											ref="myVerify"
+									>
+										<el-button size="small" type="primary">验证时间戳</el-button>
 									</el-upload>
-
+									<el-button type="primary" size="mini" @click="handleDig(scope.row)">解密签名</el-button>
 								</div>
 							</el-table-column>
 							<el-empty description="暂无信息"></el-empty>
@@ -185,12 +215,17 @@
 			el: '#app',
 			data() {
 				return {
+					rname:'',
 					par:'',
+					AES:'',
+					dig:'',
 					filelist: [],
+					digList:[],
 					verify:{},
 					verifyList:[],
 					formData: {},
 					dialogFormVisible:false,
+					dialogFormVisible2:false,
 					dialogFormVisible4Edit: false,
 					dialogImageUrl:'',
 					dialogVisible:false,
@@ -205,6 +240,8 @@
                     PageSize:3,
 					rules: {
 						picture_name: [{ required: true, message: '请输入图片名称', trigger: 'blur' }],
+						AES: [{ required: true, message: '请输入AES密钥', trigger: 'blur' }],
+						dig: [{ required: true, message: '请上传签名文件', trigger: 'blur' }],
 						picture:[{ required: true, message: '请上传图片', trigger: 'blur' }]
 					},
 				}
@@ -222,6 +259,7 @@
                     // 改变默认的页数
                     this.currentPage=val
                 },
+
 				handleOpen(key, keyPath) {
 					console.log(key, keyPath);
 
@@ -231,19 +269,35 @@
 				},
 				handlePicturePreview(file) {
 					console.log(file)
+					console.log(6)
 					this.par=file.raw;
+					const isLt2M = file.size / 1024 / 1024 < 10;
+
+					if (!isLt2M) {
+						this.$message.error('上传头像图片大小不能超过 10MB!');
+						this.clearFiles();
+						return isLt2M;
+					}
+
 				},
 				handlePreview(file) {
 					console.log(file);
 				},
-				handleRemove(file) {
-					console.log(file)
-				},
+
 				clearFiles () {
 					this.$refs['mYupload'].clearFiles();
 				},
+				clearDig () {
+					this.$refs['myDig'].clearFiles();
+				},
 				handlePictureCardPreview(file) {
 					this.dialogImageUrl = file.url;
+
+					this.dialogVisible = true;
+				},
+				handlePictureCardPreviewTable(file) {
+
+					this.dialogImageUrl =window.document.location.href+'./img/'+file.picture_realname+'.'+file.picture_type;
 
 					this.dialogVisible = true;
 				},
@@ -386,9 +440,18 @@
 				//重置表单
 				resetForm() {
 					this.formData = {};
-					//this.$refs['form'].clearValidate();
+					//this.$refs['myDig'].clearValidate();
 					this.$nextTick(() => {
-						this.$refs.forms.clearValidate()
+						this.$refs.mYupload.clearFiles()
+					})
+
+				},
+				//重置解密
+				resetDig() {
+					this.formData = {};
+
+					this.$nextTick(() => {
+						this.$refs.myDig.clearFiles()
 					})
 				},
 				//弹出添加窗口
@@ -396,11 +459,20 @@
 					this.resetForm();
 					this.dialogFormVisible = true;
 				},
+				uploadDig(file){
+					this.dig=file.raw;
+				},
+				handleDig(file) {
+                	this.rname=file.picture_realname;
+					this.resetDig();
+					this.dialogFormVisible2 = true;
+				},
 				handleVerify() {
 					this.resetForm();
 					this.dialogFormVisible4Edit = true;
 				},
 				openFile(file,name) {
+                	let this_vue=this
 					//验证的文件
 					console.log(name.picture_name)
 					var reader = new FileReader();
@@ -411,11 +483,52 @@
 							var p= name.picture_id+';'+ reader.result
 
 							axios.post("/file/verify", p,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
-								console.log(res)
+								if(res.data!=0){
+									this_vue.$alert('AES密钥(请复制):'+res.data,'验证成功', {
+										confirmButtonText: '确定',
+									});
+								}else{
+									this_vue.$alert("请重新确认",'验证错误', {
+										confirmButtonText: '确定',
+									});
+								}
 							})
 						}
 					};
 					reader.readAsText(file.raw);
+					this.$refs['myVerify'].clearFiles();
+				},
+				handleEncryptionDig(){
+                	let file=this.dig
+					let this_vue=this
+					let aes = this.formData.AES+";"+this.rname;
+					let reader = new FileReader();
+					reader.onload = function () {
+						if (reader.result) {
+							//打印文件内容
+							let str = reader.result+aes;
+							axios.post("/file/encrypt",str,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
+								if(res.data=="success"){
+									this_vue.$alert('文件签名正确！','验证成功', {
+										confirmButtonText: '确定',
+									});
+								}else if(res.data=="failed"){
+									this_vue.$alert('文件与签名不符，请重新检查！','验证出错', {
+										confirmButtonText: '确定',
+									});
+								}else {
+									this_vue.$alert('服务器可能出错，或密钥格式错误，请稍后重试！','验证出错', {
+										confirmButtonText: '确定',
+									});
+								}
+
+							});
+						}
+					};
+					reader.readAsText(file);
+					this.dialogFormVisible2 = false;
+					this.rname=null;
+					this.resetDig();
 				},
 				handleEdit() {
 					const _file = this.par;

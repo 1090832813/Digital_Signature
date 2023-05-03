@@ -1,8 +1,12 @@
 package com.hao.digitalsignature.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hao.digitalsignature.encryption.AES1;
 import com.hao.digitalsignature.encryption.DSASign;
+import com.hao.digitalsignature.entity.Download;
 import com.hao.digitalsignature.entity.User;
+import com.hao.digitalsignature.mapper.DownloadMapper;
 import com.hao.digitalsignature.mapper.UserMapper;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,29 +28,10 @@ public class FilesController {
 
     @Autowired
     private FileMapper fileMapper;
-//    @PostMapping("/upload")
-//    public String up(String name, MultipartFile photo, HttpServletRequest request) throws IOException{
-//        //自定文件名
-//        System.out.println(name);
-//        //文件原名
-//        System.out.println(photo.getOriginalFilename());
-//        //文件类型
-//        System.out.println(photo.getContentType());
-//
-//        String path=request.getServletContext().getRealPath("/upload/");
-//        System.out.println(path);
-//        saveFile(photo,path);
-//        return "上传成功";
-//    }
-//
-//    public void saveFile(MultipartFile photo,String path) throws IOException{
-//        File dir = new File(path);
-//        if (!dir.exists()){
-//            dir.mkdir();
-//        }
-//        File file = new File(path+photo.getOriginalFilename());
-//        photo.transferTo(file);
-//    }
+
+    @Autowired
+    private DownloadMapper downloadMapper;
+
     @PutMapping("/file/update")
     public String update(int id,String name){
         Files file = fileMapper.selectById(id);
@@ -89,14 +74,45 @@ public class FilesController {
         System.out.println(file);
         if(file.getCreatetime().equals( str[4])){
             System.out.println("success");
+            QueryWrapper<Download> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("picture_realname", file.getPicture_realname());
+            Download download = downloadMapper.selectOne(queryWrapper);
+            String aes =download.getaes();
+            return aes;
         }else {
             System.out.println("failed");
         }
-//        str[3];
-
         return "0";
     }
-
+    @PostMapping(value = "/file/encrypt")
+    public String encrypt(@RequestBody String str){
+        String[] strs =str.substring(1,str.length()-1).split(";");
+        for(int i =0;i<strs.length;i++)
+            System.out.println(strs[i]);
+        try {
+            String encryContent= AES1.decryptAES(strs[2],strs[4]);
+            strs[2]=encryContent;
+            String newStr =new String();
+            for(int i =0;i<strs.length-3;i++) {
+                newStr += strs[i];
+                newStr += ";";
+            }
+            newStr=newStr.substring(0,newStr.length()-1);
+            QueryWrapper<Files> wrapper = new QueryWrapper<>();
+            wrapper.eq("picture_realname", strs[5]);
+            Files files = fileMapper.selectOne(wrapper);
+            System.out.println(files.getDig());
+            System.out.println(newStr);
+            if(files.getDig().equals(newStr)){
+                return "success";
+            }else {
+                return "failed";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "error";
+    }
 
     @GetMapping("/file/findAll")
     public List<Files> find(){
