@@ -35,27 +35,26 @@
 </head>
 <body>
     <div id="app">
-        <div style="text-align: center;"><h2>Register With Us</h2></div>
+        <div style="text-align: center;"><h2>注册账号</h2></div>
         <br>
-        <el-form ref="form" :model="form" label-width="80px"  label-position="top" >
-            
+        <el-form ref="forms" :model="form" label-width="80px"  label-position="top" >
             <el-form-item>
-                <label class="el-form-item__label efi"  >Username</label>
-              <el-input v-model="form.name" placeholder="Enter username"></el-input>
+                <label class="el-form-item__label efi"  >用户名</label>
+              <el-input v-model="form.name" placeholder="请输入用户名"></el-input>
             </el-form-item>
             <el-form-item>
-                <label class="el-form-item__label efi"  >Email</label>
-                <el-input v-model="form.name" placeholder="Enter email"></el-input>
+                <label class="el-form-item__label efi"  >邮箱</label>
+                <el-input v-model="form.email" placeholder="请输入邮箱" type="email"></el-input>
             </el-form-item>
             <el-form-item>
-                <label class="el-form-item__label efi"  >Password</label>
-                <el-input v-model="form.name" placeholder="Enter password"></el-input>
+                <label class="el-form-item__label efi"  >密码</label>
+                <el-input v-model="form.password" placeholder="请输入密码" show-password type="password"></el-input>
             </el-form-item>
             <el-form-item>
-                <label class="el-form-item__label efi"  >Confirm Password</label>
-                <el-input v-model="form.name" placeholder="Enter password again"></el-input>
+                <label class="el-form-item__label efi"  >确认密码</label>
+                <el-input v-model="passwordAgain" placeholder="请再次输入密码" show-password type="password"></el-input>
             </el-form-item>
-            <el-button type="primary" id="btn">Submit</el-button>
+            <el-button type="primary" id="btn" @click="onSubmit">注册</el-button>
           </el-form>
     </div>
 </body>
@@ -67,21 +66,21 @@
   el: '#app',
   data() {
       return {
-        form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
-        }
+          form: {},
+          passwordAgain:''
       }
     },
     methods: {
       onSubmit() {
-        console.log('submit!');
+        if(this.form.password==this.passwordAgain){
+            this.$alert('注册成功','恭喜', {
+                confirmButtonText: '确定',
+            });
+        }else {
+            this.$alert('两次密码不同，请重新输入','警告', {
+                confirmButtonText: '确定',
+            });
+        }
       }
     }
 });
