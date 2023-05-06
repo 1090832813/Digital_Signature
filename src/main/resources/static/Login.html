@@ -7,34 +7,26 @@
     <title>Document</title>
     <!-- 引入样式 -->
 <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-<link rel="stylesheet" href="css/Reg.css">
+    <link rel="stylesheet" href="css/Reg.css">
 </head>
 <body>
     <div id="app">
-        <div style="text-align: center;"><h2>注册账号</h2></div>
+        <div style="text-align: center;"><h2>登  录</h2></div>
         <br>
         <el-form ref="forms" :model="form" label-width="80px" :rules="rules" label-position="top" >
-            <el-form-item :rules="rules.user_name" prop="user_name">
-                <label class="el-form-item__label efi"  >用户名</label>
-              <el-input v-model="form.user_name" placeholder="请输入用户名"></el-input>
-            </el-form-item>
             <el-form-item :rules="rules.email" prop="email">
                 <label class="el-form-item__label efi"  >邮箱</label>
                 <el-input v-model="form.email" ref="email" placeholder="请输入邮箱" type="email"></el-input>
             </el-form-item>
             <el-form-item :rules="rules.password" prop="password">
                 <label class="el-form-item__label efi"  >密码</label>
-                <el-input v-model="form.password" placeholder="请输入密码" show-password type="password"></el-input>
-            </el-form-item>
-            <el-form-item :rules="rules.passwordAgain" prop="passwordAgain">
-                <label class="el-form-item__label efi"  >确认密码</label>
-                <el-input v-model="form.passwordAgain" ref="pwda" placeholder="请再次输入密码" show-password type="password"></el-input>
+                <el-input v-model="form.password" ref="psw"  placeholder="请输入密码" show-password type="password"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" id="btn" @click="onSubmit">注册</el-button>
+                <el-button type="primary" id="btn" @click="onSubmit">登录</el-button>
             </el-form-item>
             <div class="sw">
-                已有账号，<a href="Login.html">去登陆</a>
+                已有账号，<a href="Reg.html">去注册</a>
             </div>
           </el-form>
     </div>
@@ -44,6 +36,6 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.js"></script>
 <!-- 引入组件库 -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="js/javascript/Reg.js"></script>
+<script src="js/javascript/Login.js"></script>
 
 </html>

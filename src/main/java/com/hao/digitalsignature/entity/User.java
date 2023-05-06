@@ -1,5 +1,6 @@
 package com.hao.digitalsignature.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,25 +10,30 @@ import java.util.List;
 public class User {
     @TableId(type = IdType.AUTO)
     private Integer user_id;
-    private String user_name;
     private String password;
-    private String realname;
     private String email;
+    private String user_name;
+
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
+    private String realname;
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
     private String telephone;
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
     private String country;
 
     @TableField(exist = false)
     private List<Files> files;
+    @TableField(exist = false)
+    private String passwordAgain;
 
-    public User(Integer user_id, String user_name, String password, String realname, String email, String telephone, String country) {
+    public User(Integer user_id, String password, String email, String user_name, String realname, String telephone, String country) {
         this.user_id = user_id;
-        this.user_name = user_name;
         this.password = password;
-        this.realname = realname;
         this.email = email;
+        this.user_name = user_name;
+        this.realname = realname;
         this.telephone = telephone;
         this.country = country;
-
     }
 
     public Integer getUser_id() {
@@ -38,14 +44,6 @@ public class User {
         this.user_id = user_id;
     }
 
-    public String getUser_name() {
-        return user_name;
-    }
-
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -54,20 +52,28 @@ public class User {
         this.password = password;
     }
 
-    public String getRealname() {
-        return realname;
-    }
-
-    public void setRealname(String realname) {
-        this.realname = realname;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
     }
 
     public String getTelephone() {
@@ -94,17 +100,26 @@ public class User {
         this.files = files;
     }
 
+    public String getPasswordAgain() {
+        return passwordAgain;
+    }
+
+    public void setPasswordAgain(String passwordAgain) {
+        this.passwordAgain = passwordAgain;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "user_id=" + user_id +
-                ", user_name='" + user_name + '\'' +
                 ", password='" + password + '\'' +
-                ", realname='" + realname + '\'' +
                 ", email='" + email + '\'' +
+                ", user_name='" + user_name + '\'' +
+                ", realname='" + realname + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", country='" + country + '\'' +
                 ", files=" + files +
+                ", passwordAgain='" + passwordAgain + '\'' +
                 '}';
     }
 }

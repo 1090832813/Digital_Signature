@@ -26,7 +26,10 @@
 			<el-container>
 				<el-header>
 					数字图像保护系统
+					<a href="Login.html" style="float: right">登录</a>
+					<a href="Reg.html" style="float: right">注册</a>
 				</el-header>
+
 				<el-container>
 					<el-aside width="200px">
 						<el-col :span="24">
@@ -415,28 +418,7 @@
                         this.totalCount=result.data.length
 					})
 				},
-				// uploadFile(params) {
-				// 	console.log("uploadFile", params);
-				// 	console.log("par:", this.par);
-				// 	const _file = params.file;
-				// 	// 通过 FormData 对象上传文件
-				// 	var formData = new FormData();
-				// 	formData.append("file", _file);
-				// 	console.log("data:"+this.formData)
-				// 	if(params.file.type!="text/plain") {
-				// 		axios.post("/file/upload", formData).then((res) => {
-				// 			console.log(res.data)
-				// 			this.formData.picture_realname = res.data.split(".")[0]
-				// 			console.log(this.picture_realname)
-				// 			this.formData.picture_type = res.data.split(".")[1]
-				//
-				// 		})
-				// 	}else{
-				// 		axios.post("/file/verify", formData).then((res) => {
-				// 			console.log(res)
-				// 		})
-				// 	}
-				// },
+
 				//重置表单
 				resetForm() {
 					this.formData = {};
