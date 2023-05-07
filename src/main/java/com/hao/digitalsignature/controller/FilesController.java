@@ -28,7 +28,8 @@ public class FilesController {
 
     @Autowired
     private FileMapper fileMapper;
-
+    @Autowired
+    private UserMapper userMapper;
     @Autowired
     private DownloadMapper downloadMapper;
 
@@ -52,9 +53,13 @@ public class FilesController {
         DSASign dsa = new DSASign();
         dsa.initKeys();
         //要签名的数据，传入AES加密后的内容
-        String message = file.getPicture_realname();
-        System.out.println("签名的数据："+message);
-        BigInteger sig[] = dsa.signature(message.getBytes());
+        String message =file.getPicture_user() + file.getPicture_realname();
+        //获取上传用户的dsa密钥
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", file.getPicture_user());
+        User user = userMapper.selectOne(wrapper);
+
+        BigInteger sig[] = dsa.signature(message.getBytes(),user.getDsakey());
         String dig=sig[0]+";"+sig[1]+";"+dsa._hashInZq(message.getBytes());
         file.setDig(dig);
         int i = fileMapper.insert(file);
@@ -90,6 +95,7 @@ public class FilesController {
         for(int i =0;i<strs.length;i++)
             System.out.println(strs[i]);
         try {
+            //得到aes解密后的消息摘要
             String encryContent= AES1.decryptAES(strs[2],strs[4]);
             strs[2]=encryContent;
             String newStr =new String();
@@ -101,18 +107,27 @@ public class FilesController {
             QueryWrapper<Files> wrapper = new QueryWrapper<>();
             wrapper.eq("picture_realname", strs[5]);
             Files files = fileMapper.selectOne(wrapper);
-            System.out.println(files.getDig());
-            System.out.println(newStr);
-            if(files.getDig().equals(newStr)){
-                return "success";
-            }else {
-                return "failed";
-            }
+
+                //获取上传用户的dsa密钥
+                QueryWrapper<User> wrappers = new QueryWrapper<>();
+                wrappers.eq("email", files.getPicture_user());
+                User user = userMapper.selectOne(wrappers);
+                DSASign dsaSign=new DSASign();
+                System.out.println(dsaSign.verify(newStr,user.getDsakey()));
+                if(dsaSign.verify(newStr,user.getDsakey())){
+                    return "success";
+                }else {
+                    return "failed";
+                }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "error";
     }
+
+
+
 
     @GetMapping("/file/findAll")
     public List<Files> find(){

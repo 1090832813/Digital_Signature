@@ -11,12 +11,12 @@ public class Files {
     private String picture_name;
     private String picture_type;
     @TableField(insertStrategy = FieldStrategy.IGNORED)
-    private Integer picture_user;
+    private String picture_user;
     private String createtime;
     private String picture_realname;
     private String dig;
 
-    public Files(Integer picture_id, String picture_name, String picture_type, Integer picture_user, String createtime, String picture_realname, String dig) {
+    public Files(Integer picture_id, String picture_name, String picture_type, String picture_user, String createtime, String picture_realname, String dig) {
         this.picture_id = picture_id;
         this.picture_name = picture_name;
         this.picture_type = picture_type;
@@ -50,11 +50,11 @@ public class Files {
         this.picture_type = picture_type;
     }
 
-    public Integer getPicture_user() {
+    public String getPicture_user() {
         return picture_user;
     }
 
-    public void setPicture_user(Integer picture_user) {
+    public void setPicture_user(String picture_user) {
         this.picture_user = picture_user;
     }
 

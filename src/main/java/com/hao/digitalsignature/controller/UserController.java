@@ -1,6 +1,7 @@
 package com.hao.digitalsignature.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hao.digitalsignature.encryption.DSASign;
 import com.hao.digitalsignature.entity.User;
 import com.hao.digitalsignature.mapper.UserMapper;
 
@@ -41,6 +42,9 @@ public class UserController {
             return "exist";
         }
         System.out.println("不存在");
+        DSASign dsaSign=new DSASign();
+        String dsakey = dsaSign.initKeys();
+        user.setDsakey(dsakey);
         int i = userMapper.insert(user);
         if (i>0)
             return "success";

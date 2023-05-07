@@ -20,13 +20,15 @@ public class User {
     private String telephone;
     @TableField(insertStrategy = FieldStrategy.IGNORED)
     private String country;
+    private String dsakey;
+
 
     @TableField(exist = false)
     private List<Files> files;
     @TableField(exist = false)
     private String passwordAgain;
 
-    public User(Integer user_id, String password, String email, String user_name, String realname, String telephone, String country) {
+    public User(Integer user_id, String password, String email, String user_name, String realname, String telephone, String country, String dsakey) {
         this.user_id = user_id;
         this.password = password;
         this.email = email;
@@ -34,6 +36,7 @@ public class User {
         this.realname = realname;
         this.telephone = telephone;
         this.country = country;
+        this.dsakey = dsakey;
     }
 
     public Integer getUser_id() {
@@ -108,6 +111,14 @@ public class User {
         this.passwordAgain = passwordAgain;
     }
 
+    public String getDsakey() {
+        return dsakey;
+    }
+
+    public void setDsakey(String dsakey) {
+        this.dsakey = dsakey;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -118,6 +129,7 @@ public class User {
                 ", realname='" + realname + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", country='" + country + '\'' +
+                ", dsakey='" + dsakey + '\'' +
                 ", files=" + files +
                 ", passwordAgain='" + passwordAgain + '\'' +
                 '}';

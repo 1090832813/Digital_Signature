@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.Array;
 import java.sql.SQLOutput;
 import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
@@ -36,7 +37,7 @@ public class DSASign {
         return null;
     }
     //生成公钥私钥
-    public void initKeys(){
+    public String initKeys(){
         q = new BigInteger(160, 100, new SecureRandom());
         // 判定100%为素数
         do {
@@ -49,14 +50,24 @@ public class DSASign {
         g = h.modPow(p.subtract(BigInteger.ONE).divide(q), p);
         x = _randomInZq();
         y = g.modPow(x, p);
+        String dsakey = q+";"+p+";"+g+";"+x+";"+y;
         System.out.println("p : " + p);
         System.out.println("q : " + q);
         System.out.println("g : " + g);
         System.out.println("发送方私钥x : " + x);
         System.out.println("发送方公钥y : " + y);
+        return dsakey;
     }
     //产生签名
-    public BigInteger[] signature(byte m[]){
+    public BigInteger[] signature(byte m[] ,String dsakey){
+
+        String str[] = dsakey.split(";");
+
+        BigInteger q= new BigInteger(str[0]);
+        BigInteger p= new BigInteger(str[1]);
+        BigInteger g= new BigInteger(str[2]);
+        BigInteger x= new BigInteger(str[3]);
+
         BigInteger k = _randomInZq();
         BigInteger sig[] = new BigInteger[2];
         //得到r
@@ -67,45 +78,63 @@ public class DSASign {
         return sig;
     }
     //验证
-    public boolean verify(byte m[], BigInteger sig[]){
+    public boolean verify( String strsig,String key){
+        String[] str = strsig.split(";");
+
+        if(str[2].equals("null")){
+            System.out.println("false");
+            return false;
+        }
+
+        BigInteger[] sig = new BigInteger[2];
+        sig[0]=new BigInteger(str[0]);
+        sig[1]=new BigInteger(str[1]);
+        BigInteger Hm= new BigInteger(str[2]);
+
+        String strs[] = key.split(";");
+
+        BigInteger q= new BigInteger(strs[0]);
+        BigInteger p= new BigInteger(strs[1]);
+        BigInteger g= new BigInteger(strs[2]);
+
+        BigInteger y= new BigInteger(strs[4]);
+
         BigInteger w = sig[1].modInverse(q);
-        BigInteger u1 = _hashInZq(m).multiply(w).mod(q);
+        BigInteger u1 = Hm.multiply(w).mod(q);
         BigInteger u2 = sig[0].multiply(w).mod(q);
         BigInteger v = g.modPow(u1, p).multiply(y.modPow(u2, p)).mod(p).mod(q);
-        System.out.println("验证：");
-        System.out.println("v = " + v);
-        System.out.println("r = " + sig[0]);
+
         return v.compareTo(sig[0]) == 0;
     }
 
-    public static void main(String args[]) throws Exception {
-        String publicPath = "C:\\Users\\10908"; //公匙存放位置
-        String privatePath = "C:\\Users\\10908"; //私匙存放位置
-        BigInteger back[]=new BigInteger[2];
-        int j=0;
-        Base64 base64 = new Base64();
-        DSASign dsa = new DSASign();
-
-        //生成公钥和私钥
-        dsa.initKeys();
-        System.out.println("");
-        //要签名的数据，传入AES加密后的内容
-        String message = "NUJCQkJEQjRCRDBFODMwRTJCODkyOTQ1N0Y4NkEyNzU=";
-        System.out.println("签名的数据："+message);
-        BigInteger sig[] = dsa.signature(message.getBytes());
-
-        //消息摘要
-        System.out.println("消息摘要："+dsa._hashInZq(message.getBytes())+"\n");
-
-        //对消息摘要进行签名得到r和s,在使用RSA进行加密并发送
-        for (int i =0;i< sig.length;i++){
-        System.out.println("签名:"+sig[i].toString());
-         back[i]= new BigInteger(RSAEncrypt.RSAen(sig[i].toString()));
-        }
-        System.out.println("\n需要解密的信息:"+back[0]);
-        System.out.println("           "+back[1]);
-
-        System.out.println("验证结果:" + dsa.verify(message.getBytes(),back) );
-    }
+//    public static void main(String args[]) throws Exception {
+//        String publicPath = "C:\\Users\\10908"; //公匙存放位置
+//        String privatePath = "C:\\Users\\10908"; //私匙存放位置
+//        BigInteger back[]=new BigInteger[2];
+//        int j=0;
+//        Base64 base64 = new Base64();
+//        DSASign dsa = new DSASign();
+//
+//        //生成公钥和私钥
+//        dsa.initKeys();
+//        System.out.println("");
+//        //要签名的数据，传入AES加密后的内容
+//        String message = "NUJCQkJEQjRCRDBFODMwRTJCODkyOTQ1N0Y4NkEyNzU=";
+//        System.out.println("签名的数据："+message);
+//        BigInteger sig[] = dsa.signature(message.getBytes(), );
+//
+//        //消息摘要
+//        System.out.println("消息摘要："+dsa._hashInZq(message.getBytes())+"\n");
+//
+//        //对消息摘要进行签名得到r和s,在使用RSA进行加密并发送
+//        for (int i =0;i< sig.length;i++){
+//        System.out.println("签名:"+sig[i].toString());
+//         back[i]= new BigInteger(RSAEncrypt.RSAen(sig[i].toString()));
+//        }
+//        System.out.println("\n需要解密的信息:"+back[0]);
+//        System.out.println("           "+back[1]);
+//
+//        System.out.println("验证结果:" + dsa.verify(message.getBytes(),back) );
+//    }
 
 }

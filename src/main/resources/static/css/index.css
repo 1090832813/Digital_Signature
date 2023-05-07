@@ -54,3 +54,23 @@ body>.el-container {
 .el-breadcrumb {
 	margin-bottom: 20px;
 }
+.nav{
+	display: inline-block;
+	position: absolute;
+	right: 0;
+	margin-right: 50px;
+	font-size: 16px;
+	text-decoration: none;
+	font-weight: normal;
+	color: white;
+}
+.nav a{
+	text-decoration: none;
+	font-size: 16px;
+	text-decoration: none;
+	font-weight: normal;
+	color: white;
+}
+.nav a:hover{
+	color: orange;
+}

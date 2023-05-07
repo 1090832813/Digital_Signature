@@ -1,5 +1,6 @@
 var b=document.querySelector("body")
 b.style.height=document.documentElement.clientHeight+'px'
+
 new Vue({
     el: '#app',
     data() {
@@ -30,7 +31,10 @@ new Vue({
                         that.$refs.psw.focus();
                     });
                 }else{
-                    window.location.href="index.html"
+                    Cookies.set('email', this.form.email, { expires: 1 });
+                    let lo = window.location.href.indexOf("/Login.html")
+                    let newUrl =window.location.href.substring(0,lo)
+                    window.location.href= newUrl
                 }
             })
         }

@@ -1,5 +1,6 @@
 var b=document.querySelector("body")
 b.style.height=document.documentElement.clientHeight +'px'
+
 new Vue({
     el: '#app',
     data() {
@@ -15,6 +16,7 @@ new Vue({
         }
     },
     methods: {
+
         onSubmit() {
             const that = this
             if(this.form.password==this.form.passwordAgain){
@@ -23,14 +25,13 @@ new Vue({
                         this.$alert('邮箱已被使用，请重新输入','警告', {
                             confirmButtonText: '确定',
                         }).then(function () {
-                            //聚焦再次输入密码
                             that.$refs.email.focus();
                         });
                     }else{
                         this.$alert('注册成功','恭喜', {
                             confirmButtonText: '确定',
                         }).then(function () {
-                            window.location.href="index.html"
+                            window.location.href="Login.html"
                         });
                     }
                 })

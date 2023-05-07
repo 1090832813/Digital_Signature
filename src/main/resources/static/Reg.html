@@ -13,22 +13,29 @@
     <div id="app">
         <div style="text-align: center;"><h2>注册账号</h2></div>
         <br>
-        <el-form ref="forms" :model="form" label-width="80px" :rules="rules" label-position="top" >
+
+        <el-form ref="forms" :model="form" label-width="80px" :rules="rules" label-position="top"  autocomplete="off">
             <el-form-item :rules="rules.user_name" prop="user_name">
                 <label class="el-form-item__label efi"  >用户名</label>
-              <el-input v-model="form.user_name" placeholder="请输入用户名"></el-input>
+              <el-input v-model="form.user_name"  autocomplete ="off" placeholder="请输入用户名"></el-input>
             </el-form-item>
             <el-form-item :rules="rules.email" prop="email">
                 <label class="el-form-item__label efi"  >邮箱</label>
-                <el-input v-model="form.email" ref="email" placeholder="请输入邮箱" type="email"></el-input>
+<!--                <input type="email" style="display: none">-->
+                <el-input v-model="form.email"    ref="email" auto-complete="new-email" placeholder="请输入邮箱" type="email"></el-input>
             </el-form-item>
+            <div style="display:block;opacity: 0;width:0px;height:0px;overflow: hidden">
+                <input type="email" name="username" autocomplete="off"/>
+                <input  type="password" name="password"  autocomplete="off" readonly/>
+            </div>
             <el-form-item :rules="rules.password" prop="password">
                 <label class="el-form-item__label efi"  >密码</label>
-                <el-input v-model="form.password" placeholder="请输入密码" show-password type="password"></el-input>
+<!--                <input type="password" style="display: none">-->
+                <el-input class="pwd" v-model="form.password" auto-complete="new-password" placeholder="请输入密码"  type="password"></el-input>
             </el-form-item>
             <el-form-item :rules="rules.passwordAgain" prop="passwordAgain">
                 <label class="el-form-item__label efi"  >确认密码</label>
-                <el-input v-model="form.passwordAgain" ref="pwda" placeholder="请再次输入密码" show-password type="password"></el-input>
+                <el-input class="pwd" v-model="form.passwordAgain"  autocomplete ="off" ref="pwda" placeholder="请再次输入密码"  type="text"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" id="btn" @click="onSubmit">注册</el-button>
@@ -36,9 +43,11 @@
             <div class="sw">
                 已有账号，<a href="Login.html">去登陆</a>
             </div>
+
           </el-form>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script src="./js/axios-0.27.2.js"></script>
 <script type="text/javascript" src="./js/jquery-3.6.0.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.js"></script>

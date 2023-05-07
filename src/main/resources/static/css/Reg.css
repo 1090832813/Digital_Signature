@@ -27,3 +27,7 @@ body{
 .sw{
     text-align: center;
 }
+.pwd{
+    text-security:disc;
+    -webkit-text-security:disc;
+}
