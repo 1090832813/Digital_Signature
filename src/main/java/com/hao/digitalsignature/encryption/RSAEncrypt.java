@@ -27,9 +27,9 @@ public class RSAEncrypt {
             '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 
-    private static final String PRIVATE_KEY = "\\pkcs8_rsa_sk.pem";
+    private static final String PRIVATE_KEY = "pkcs8_rsa_sk.pem";
 
-    private static final String PUBLIC_KEY = "\\rsa_pk.pem";
+    private static final String PUBLIC_KEY = "rsa_pk.pem";
 
     /**
      * 随机生成密钥对
@@ -95,6 +95,7 @@ public class RSAEncrypt {
                 }
             }
             br.close();
+
             return sb.toString();
         } catch (IOException e) {
             throw new Exception("公钥数据流读取错误");
@@ -183,6 +184,7 @@ public class RSAEncrypt {
      */
     public static byte[] encrypt(RSAPublicKey publicKey, byte[] plainTextData)
             throws Exception {
+
         if (publicKey == null) {
             throw new Exception("加密公钥为空, 请设置");
         }
@@ -332,9 +334,9 @@ public class RSAEncrypt {
         return stringBuilder.toString();
     }
     //解密
-    public static String RSAde(byte[] cipherData) throws Exception {
-        String publicPath = "C:\\Users\\w10"; //公匙存放位置
-        String privatePath = "C:\\Users\\w10"; //私匙存放位置
+    public static String RSAde(byte[] cipherData,String email) throws Exception {
+        String publicPath = "C:\\ProgramData\\rsk_key\\"+email+"_"; //公匙存放位置
+        String privatePath = "C:\\ProgramData\\rsk_key\\"+email+"_"; //私匙存放位置
         Base64 base64 = new Base64();
         String cipher = new String(base64.encode(cipherData));
         // 私钥解密过程
@@ -345,9 +347,11 @@ public class RSAEncrypt {
         return restr;
     }
     //加密
-    public static byte[] RSAen(String key) throws Exception {
-        String publicPath = "C:\\Users\\w10"; //公匙存放位置
-        String privatePath = "C:\\Users\\w10"; //私匙存放位置
+    public static byte[] RSAen(String key,String email) throws Exception {
+        String publicPath = "C:\\ProgramData\\rsk_key\\"+email+"_"; //公匙存放位置
+        String privatePath = "C:\\ProgramData\\rsk_key\\"+email+"_"; //私匙存放位置
+//        String PRIVATE_KEY = "\\pkcs8_rsa_sk.pem";//私钥
+//        String PUBLIC_KEY = "\\rsa_pk.pem";//公钥
         Base64 base64 = new Base64();
         String signKey = key;
         // 公钥加密过程

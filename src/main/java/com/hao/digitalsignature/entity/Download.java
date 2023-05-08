@@ -4,22 +4,22 @@ import com.baomidou.mybatisplus.annotation.*;
 
 @TableName(value = "downpicture")
 public class Download {
-    private Integer user_id;
+    private String picture_user;
     private String picture_realname;
     private String aes;
 
-    public Download(Integer user_id, String picture_realname, String aes) {
-        this.user_id = user_id;
+    public Download(String picture_user, String picture_realname, String aes) {
+        this.picture_user = picture_user;
         this.picture_realname = picture_realname;
         this.aes = aes;
     }
 
-    public Integer getUser_id() {
-        return user_id;
+    public String getPicture_user() {
+        return picture_user;
     }
 
-    public void setUser_id(Integer user_id) {
-        this.user_id = user_id;
+    public void setPicture_user(String user_id) {
+        this.picture_user = user_id;
     }
 
     public String getPicture_realname() {
@@ -41,7 +41,7 @@ public class Download {
     @Override
     public String toString() {
         return "Download{" +
-                "user_id=" + user_id +
+                "picture_user=" + picture_user +
                 ", picture_realname='" + picture_realname + '\'' +
                 ", aes='" + aes + '\'' +
                 '}';

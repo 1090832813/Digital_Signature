@@ -108,7 +108,8 @@ new Vue({
                     }
                 });
             })
-            axios.post("/file/downloadMsg",f,).then((res)=>{
+            f=f+";"+Cookies.get('email')
+            axios.post("/file/downloadMsg",f,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res)=>{
                 console.log(res)
 
                 this.downloadFile(res.data,file.picture_name)
@@ -265,7 +266,7 @@ new Vue({
                 if (reader.result) {
                     //打印文件内容
                     console.log(reader.result);
-                    var p= name.picture_id+';'+ reader.result
+                    var p= name.picture_id+";"+Cookies.get('email')+';'+ reader.result
 
                     axios.post("/file/verify", p,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
                         if(res.data!=0){
@@ -291,7 +292,7 @@ new Vue({
             reader.onload = function () {
                 if (reader.result) {
                     //打印文件内容
-                    let str = reader.result+aes;
+                    let str = reader.result+";"+aes+";"+Cookies.get('email');
                     axios.post("/file/encrypt",str,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
                         if(res.data=="success"){
                             this_vue.$alert('文件签名正确！','验证成功', {

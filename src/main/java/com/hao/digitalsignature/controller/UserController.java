@@ -2,12 +2,14 @@ package com.hao.digitalsignature.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.DSASign;
+import com.hao.digitalsignature.encryption.Openssl;
 import com.hao.digitalsignature.entity.User;
 import com.hao.digitalsignature.mapper.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/user/save")
-    public String save(@RequestBody User user){
+    public String save(@RequestBody User user) throws IOException {
         System.out.println(user);
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("email", user.getEmail());
@@ -45,6 +47,8 @@ public class UserController {
         DSASign dsaSign=new DSASign();
         String dsakey = dsaSign.initKeys();
         user.setDsakey(dsakey);
+        Openssl openssl=new Openssl();
+        openssl.generatePkcs1KeyPairMap(user.getEmail());
         int i = userMapper.insert(user);
         if (i>0)
             return "success";

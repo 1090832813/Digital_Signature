@@ -4,6 +4,7 @@ package com.hao.digitalsignature.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.AES1;
 import com.hao.digitalsignature.encryption.DSASign;
+import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.hao.digitalsignature.entity.Download;
 import com.hao.digitalsignature.entity.User;
 import com.hao.digitalsignature.mapper.DownloadMapper;
@@ -70,9 +71,19 @@ public class FilesController {
     }
 
     @PostMapping(value="/file/verify")
-    public String verify(@RequestBody String obj){
+    public String verify(@RequestBody String obj) throws Exception {
 
-      String[] str = obj.substring(1,obj.length()-1).split(";");
+        RSAEncrypt rsaEncrypt=new RSAEncrypt();
+        Base64 base64 = new Base64();
+        String newobj[] = obj.substring(1,obj.length()-1).split(";");
+        System.out.println(newobj.length);
+        String cipherf =  newobj[2];
+        String ciphers =  newobj[3];
+        String rsaDef=RSAEncrypt.RSAde(base64.decode(cipherf),newobj[1]);
+        String rsaDes=RSAEncrypt.RSAde(base64.decode(ciphers),newobj[1]);
+        String dig =newobj[0]+";"+rsaDef+rsaDes;
+        System.out.println("DIG="+dig);
+        String[] str = dig.split(";");
       for(int i =0;i<str.length;i++)
           System.out.println(str[i]);
         Files file = fileMapper.selectById(str[0]);
@@ -80,7 +91,7 @@ public class FilesController {
         if(file.getCreatetime().equals( str[4])){
             System.out.println("success");
             QueryWrapper<Download> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("picture_realname", file.getPicture_realname());
+            queryWrapper.eq("picture_realname", file.getPicture_realname()).eq("picture_user",file.getPicture_user());
             Download download = downloadMapper.selectOne(queryWrapper);
             String aes =download.getaes();
             return aes;
@@ -90,8 +101,22 @@ public class FilesController {
         return "0";
     }
     @PostMapping(value = "/file/encrypt")
-    public String encrypt(@RequestBody String str){
-        String[] strs =str.substring(1,str.length()-1).split(";");
+    public String encrypt(@RequestBody String obj) throws Exception {
+
+        RSAEncrypt rsaEncrypt=new RSAEncrypt();
+        Base64 base64 = new Base64();
+        String newobj[] = obj.substring(1,obj.length()-1).split(";");
+        System.out.println(newobj.length);
+        String cipherf =  newobj[0];
+        String ciphers =  newobj[1];
+        String rsaDef=RSAEncrypt.RSAde(base64.decode(cipherf),newobj[4]);
+        String rsaDes=RSAEncrypt.RSAde(base64.decode(ciphers),newobj[4]);
+
+        String str =rsaDef+rsaDes+newobj[2]+";"+newobj[3];
+        System.out.println(newobj[3]);
+        System.out.println("STR:"+str);
+        String[] strs =str.split(";");
+
         for(int i =0;i<strs.length;i++)
             System.out.println(strs[i]);
         try {

@@ -1,5 +1,5 @@
 package com.hao.digitalsignature.controller;
-
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.AES1;
 import com.hao.digitalsignature.encryption.AESmiyao;
@@ -7,8 +7,10 @@ import com.hao.digitalsignature.encryption.DownloadMsg;
 import com.hao.digitalsignature.encryption.RSAEncrypt;
 import com.hao.digitalsignature.entity.Download;
 import com.hao.digitalsignature.entity.Files;
+import com.hao.digitalsignature.entity.User;
 import com.hao.digitalsignature.mapper.DownloadMapper;
 import com.hao.digitalsignature.mapper.FileMapper;
+import com.hao.digitalsignature.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +29,8 @@ import java.util.*;
 @RequestMapping("/file")
 @RestController
 public class FileDealController {
-
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private FileMapper fileMapper;
@@ -120,9 +123,13 @@ public class FileDealController {
 
 
     @RequestMapping(value = "/downloadMsg")
-    public void exportKtrAndKjb(@RequestBody String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        fileName = fileName.substring(0,fileName.length()-1);
-
+    public void exportKtrAndKjb(@RequestBody String fileNames, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        fileNames = fileNames.substring(1,fileNames.length()-1);
+        System.out.println(fileNames);
+        String fileName=fileNames.split(";")[0];
+        String downloadUser = fileNames.split(";")[1];
+        System.out.println(fileName);
+        System.out.println(downloadUser);
         //获取摘要
         try {
 
@@ -141,7 +148,7 @@ public class FileDealController {
         //生成AES密钥
         String aesPassword =AESmiyao.getKey();
         if(files.getPicture_realname()!=null){
-            Download download=new Download(0,files.getPicture_realname(),aesPassword);
+            Download download=new Download(files.getPicture_user(),files.getPicture_realname(),aesPassword);
             System.out.println(download);
             downloadMapper.insert(download);
             System.out.println("成功");
@@ -162,13 +169,17 @@ public class FileDealController {
             rsaMsg+=";";
         }
             System.out.println(rsaMsg);
-        byte[] rsaEnf=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()/2));
-        byte[] rsaEns=RSAEncrypt.RSAen(rsaMsg.substring(rsaMsg.length()/2));
+        byte[] rsaEnf=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()/2),downloadUser);
+        byte[] rsaEns=RSAEncrypt.RSAen(rsaMsg.substring(rsaMsg.length()/2),downloadUser);
+        Base64 base64 = new Base64();
+        String cipherf = new String(base64.encode(rsaEnf));
+        String ciphers = new String(base64.encode(rsaEns));
+
 
         //RSA解密
-        String rsaDef=RSAEncrypt.RSAde(rsaEnf);
-        String rsaDes=RSAEncrypt.RSAde(rsaEns);
-        String recRes=rsaDef+rsaDes;
+        //String rsaDef=RSAEncrypt.RSAde(base64.decode(cipherf),files.getPicture_user());
+       // String rsaDes=RSAEncrypt.RSAde(base64.decode(ciphers),files.getPicture_user());
+        String recRes=cipherf+";"+ciphers;
 
        DownloadMsg.downloadByStringContent(request, response, fileName.split("\\.")[0], recRes);
 
