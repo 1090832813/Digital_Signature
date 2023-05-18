@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 1. 引入vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 2. 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 3. 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+<div id="app">
+    <el-main>
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item  :to="{ path: '/' }"><a href="index.html">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item>个人信息</el-breadcrumb-item>
+
+        </el-breadcrumb>
+        <div class="msg">
+            <el-form :label-position="labelPosition" label-width="80px" :model="formData">
+                <el-form-item label="用户名">
+                    <el-input v-model="formData.user_name"></el-input>
+                </el-form-item>
+                <el-form-item label="真实姓名">
+                    <el-input v-model="formData.realname"></el-input>
+                </el-form-item>
+                <el-form-item label="电子邮箱">
+                    <el-input v-model="formData.email"></el-input>
+                </el-form-item>
+                <el-form-item label="电话号码">
+                    <el-input v-model="formData.telephone"></el-input>
+                </el-form-item>
+                <el-form-item label="国家">
+                    <el-input v-model="formData.country"></el-input>
+                </el-form-item>
+                <el-form-item label="签名私钥">
+                    <el-input v-model="(formData.dsakey||'').split(';')[3]" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="签名公钥">
+                    <el-input v-model="(formData.dsakey||'').split(';')[4]" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="">
+                    <el-button type="primary" @click="updateMsg()">更新个人信息</el-button>
+                </el-form-item>
+            </el-form>
+
+        </div>
+    </el-main>
+</div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script src="./js/axios-0.27.2.js"></script>
+<script type="text/javascript" src="./js/jquery-3.6.0.js"></script>
+<script src="js/javascript/selfmsg.js"></script>
+</html>

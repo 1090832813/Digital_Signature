@@ -3,6 +3,7 @@ package com.hao.digitalsignature.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hao.digitalsignature.encryption.DSASign;
 import com.hao.digitalsignature.encryption.Openssl;
+import com.hao.digitalsignature.entity.Files;
 import com.hao.digitalsignature.entity.User;
 import com.hao.digitalsignature.mapper.UserMapper;
 
@@ -20,15 +21,17 @@ public class UserController {
 
 
     @GetMapping("/user/findAll")
-    public List<User> find(){
-        return  userMapper.selectAllUserAndFiles();
+    public List<User> findAll(){
+        return  userMapper.selectList(null);
     }
 
-    @GetMapping("/user/allUser")
-    public List query() {
-        List<User> list = userMapper.selectList(null);
-        System.out.println(list);
-        return list;
+    @PostMapping("/user/find")
+    public User find(@RequestBody String email){
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("email",email.substring(1,email.length()-1));
+        User user = userMapper.selectOne(wrapper);
+        return user;
     }
 
     @PostMapping("/user/save")
@@ -71,20 +74,27 @@ public class UserController {
         }
     }
 
-    @PutMapping("/user/update")
+    @PostMapping("/user/update")
     public String update(@RequestBody User user){
-//        User user = userMapper.selectById(id);
-//        if (user!=null){
-//            user.setUser_name(name);
-//            userMapper.updateById(user);
-//            return "success";
-//        }
-//        else
-           return "fail";
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", user.getEmail()).ne("user_id",user.getUser_id());
+        User exUser = userMapper.selectOne(wrapper);
+        if (exUser==null){
+            int i = userMapper.updateById(user);
+            if(i>0)
+                return "success";
+            else
+                return "fail";
+        }
+        else{
+           return "exist";
+        }
     }
-    @DeleteMapping("/user/delete")
-    public String delete(int id){
-        int i= userMapper.deleteById(id);
+    @PostMapping("/user/delete")
+    public String delete(@RequestBody User user){
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", user.getEmail());
+        int i = userMapper.delete(wrapper);
         if (i>0)
             return "success";
         else

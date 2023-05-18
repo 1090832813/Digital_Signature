@@ -74,3 +74,7 @@ body>.el-container {
 .nav a:hover{
 	color: orange;
 }
+.msg{
+	margin: 0 auto;
+	width: 500px;
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 1. 引入vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 2. 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 3. 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+<div id="app">
+    <el-main>
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/' }">系统管理</el-breadcrumb-item>
+            <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+
+        </el-breadcrumb>
+        <div class="sub">
+            <el-table :data="userlist.slice((currentPage-1)*PageSize,currentPage*PageSize)" stripe style="width: 100%" >
+                <el-table-column prop="user_name" label="名称" width="180">
+                </el-table-column>
+                <el-table-column prop="realname" label="真实名称" width="100">
+                </el-table-column>
+                <el-table-column prop="email" label="邮箱" width="180">
+                </el-table-column>
+                <el-table-column prop="telephone" label="电话号码" width="120">
+                </el-table-column>
+                <el-table-column prop="country" label="国家">
+                </el-table-column>
+                <el-table-column prop="dsakey" label="签名公钥"  width="380">
+                    <template slot-scope="scope">
+                        <span >{{pubkey(scope.row.dsakey)}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column  label="功能" >
+                    <div slot-scope="scope" style="display: flex;justify-content: space-around">
+                        <el-popconfirm
+                                title="用户删除后不可恢复，确定删除吗？"
+                                @confirm="del(scope.row)"
+                        >
+                            <el-button slot="reference" >删除</el-button>
+                        </el-popconfirm>
+<!--                        <el-button type="primary" size="mini">删除</el-button>-->
+                    </div>
+                </el-table-column>
+                <el-empty description="暂无信息"></el-empty>
+            </el-table>
+            <div class="block">
+                <el-pagination
+                        :current-page="currentPage"
+                        :page-sizes="pageSizes"
+                        :page-size="PageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalCount">
+                </el-pagination>
+            </div>
+        </div>
+    </el-main>
+</div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script src="./js/axios-0.27.2.js"></script>
+<script type="text/javascript" src="./js/jquery-3.6.0.js"></script>
+<script src="js/javascript/usetTable.js"></script>
+</html>
