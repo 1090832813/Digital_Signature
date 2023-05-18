@@ -70,7 +70,7 @@ public class Files {
         return picture_realname;
     }
 
-    public void setPicture_realname(String picture_realname) {
+    public void setPicture_realname() {
         this.picture_realname = picture_realname;
     }
 

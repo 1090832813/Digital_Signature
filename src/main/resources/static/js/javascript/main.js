@@ -24,46 +24,14 @@ new Vue({
             // 个数选择器（可修改）
             pageSizes:[3,5,10],
             // 默认每页显示的条数（可修改）
-            PageSize:3,
+            PageSize:5,
             rules: {
                 picture_name: [{ required: true, message: '请输入图片名称', trigger: 'blur' }],
                 AES: [{ required: true, message: '请输入AES密钥', trigger: 'blur' }],
                 dig: [{ required: true, message: '请上传签名文件', trigger: 'blur' }],
                 picture:[{ required: true, message: '请上传图片', trigger: 'blur' }]
             },
-            menuList:[
-                {
-                    "path": "1",
-                    "title": "图片版权管理",
-                    "icon":"fa-dashboard",
-                    "children": [
-                        {
-                            "path": "/1-1",
-                            "title": "图片管理",
-                            "linkUrl":"main.html",
-                            "children":[]
-                        }
-                    ]
-                },
-                {
-                    "path": "2",
-                    "title": "系统管理",
-                    "icon":"fa-user-md",
-                    "children": [
-                        {
-                            "path": "/2-1",
-                            "title": "用户管理",
-                            "linkUrl":"userTable.html",
-                            "children":[]
-                        },{
-                            "path": "/2-2",
-                            "title": "图片管理",
-                            "linkUrl":"picTable.html",
-                            "children":[]
-                        }
-                    ]
-                }
-            ]
+
         }
     },
     methods: {
@@ -226,23 +194,13 @@ new Vue({
         },
 
         init(){
-            // const that = this
-            // axios.get("/file/findAll", this.formData, ).then((result) => {
-            //
-            //     that.filelist = result.data
-            //     that.totalCount=result.data.length
-            // });
-            let nav =document.querySelector(".nav")
-            console.log(Cookies.get('email')==undefined)
-            if(Cookies.get('email')!=undefined){
+            const that = this
+            axios.get("/file/findAll", this.formData, ).then((result) => {
 
-                nav.innerHTML =`欢迎您，<a href="#">${Cookies.get('email')}</a>
-                                <a href="#" onclick="quit()">退出</a> `
-            }else{
-                nav.innerHTML = `<a href="Login.html" class="rl" >登录</a>
-                                <span> / </span>
-                                <a href="Reg.html" class="rl" >注册</a>`
-            }
+                that.filelist = result.data
+                that.totalCount=result.data.length
+            });
+
         },
         quit(){
             Cookies.remove('email');

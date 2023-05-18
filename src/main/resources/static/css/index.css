@@ -64,12 +64,15 @@ body>.el-container {
 	font-weight: normal;
 	color: white;
 }
+a{
+	text-decoration: none;
+	color: white;
+}
 .nav a{
 	text-decoration: none;
 	font-size: 16px;
-	text-decoration: none;
 	font-weight: normal;
-	color: white;
+
 }
 .nav a:hover{
 	color: orange;
@@ -77,4 +80,13 @@ body>.el-container {
 .msg{
 	margin: 0 auto;
 	width: 500px;
+}
+.el-mains{
+	padding: 0;
+}
+.el-menu-item{
+	background-color: rgb(79,88,93)!important;
+}
+.el-menu-item:hover{
+	background-color: rgb(67,74,80)!important
 }

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -151,8 +153,29 @@ public class FilesController {
         return "error";
     }
 
+    @PostMapping("/file/delete")
+    public String delete(@RequestBody Files files){
+        QueryWrapper<Files> wrapper = new QueryWrapper<>();
+        wrapper.eq("picture_realname", files.getPicture_realname());
+        int i = fileMapper.delete(wrapper);
+        File filep = new File("");
+        String filePath = null;
+        try {
+            filePath = filep.getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String fileSaveRootPath =filePath+"\\src\\main\\resources\\static\\img";
 
+        File file = new File(fileSaveRootPath+ "\\" + files.getPicture_realname()+"."+files.getPicture_type());
 
+        boolean deleted = file.delete();
+
+        if (i>0&&deleted)
+            return "success";
+        else
+            return "fail";
+    }
 
     @GetMapping("/file/findAll")
     public List<Files> find(){

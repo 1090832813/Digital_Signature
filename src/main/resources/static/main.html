@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 1. 引入vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 2. 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 3. 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div id="app">
+
+<el-main>
+    						<el-breadcrumb separator-class="el-icon-arrow-right">
+    							<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    							<el-breadcrumb-item>图片管理</el-breadcrumb-item>
+
+    						</el-breadcrumb>
+
+    						<el-button size="small" type="primary" @click="handleCreate()">点击上传</el-button>
+    						<div id="addpic">
+    							<el-dialog title="添加图片" :visible.sync="dialogFormVisible">
+    								<el-form  :model="formData" label-width="80px" :rules="rules" ref="forms">
+    									<el-form-item label="图片名称" :rules="rules.picture_name" prop="picture_name">
+    										<el-input v-model="formData.picture_name"  ></el-input>
+    									</el-form-item>
+    									<el-form-item label="图片" :rules="rules.picture" prop="picture">
+    										<el-upload
+    												action="#"
+    												list-type="picture-card"
+    												:auto-upload="false"
+    												:limit="1"
+    												accept="image/png, image/jpeg"
+    												ref="mYupload"
+    												:on-change="handlePicturePreview"
+    												:on-success="handlePicturePreview"
+    												>
+    											<i slot="default" class="el-icon-plus"></i>
+    											<div slot="file" slot-scope="{file}">
+    												<img
+    														class="el-upload-list__item-thumbnail"
+    														:src="file.url" alt=""
+    												>
+    												<span class="el-upload-list__item-actions">
+    													<span
+    															class="el-upload-list__item-preview"
+    															@click="handlePictureCardPreview(file)"
+    													>
+    													  <i class="el-icon-zoom-in"></i>
+    													</span>
+
+    													<span
+    															v-if="!disabled"
+    															class="el-upload-list__item-delete"
+    															@click="clearFiles()"
+    													>
+    													  <i class="el-icon-delete"></i>
+    													</span>
+    											  	</span>
+    											</div>
+    										</el-upload>
+
+    									</el-form-item>
+    									<el-form-item>
+    										<el-button type="primary" @click="handleEdit()">立即创建</el-button>
+    										<el-button @click="dialogFormVisible = false,resetForm()">取消</el-button>
+    									</el-form-item>
+    								</el-form>.
+    							</el-dialog>
+    							<el-dialog :visible.sync="dialogVisible">
+    								<img width="100%" :src="dialogImageUrl" alt="">
+    							</el-dialog>
+    							<el-dialog title="解密签名" :visible.sync="dialogFormVisible2">
+    								<el-form  :model="formData" label-width="80px" :rules="rules" ref="dforms">
+    									<el-form-item label="AES密钥" :rules="rules.AES" prop="AES">
+    										<el-input v-model="formData.AES"  ></el-input>
+    									</el-form-item>
+    									<el-form-item label="签名文件" :rules="rules.dig" prop="dig">
+    										<el-upload
+    												class="digFile"
+    												action="#"
+    												:auto-upload="false"
+    												accept="text/plain"
+    												:limit="1"
+    												:file-list="digList"
+    												:on-change="uploadDig"
+    												ref="myDig"
+    										>
+    											<el-button size="small" type="primary">上传签名文件</el-button>
+    										</el-upload>
+    									</el-form-item>
+    									<el-form-item>
+    										<el-button type="primary" @click="handleEncryptionDig()">立即解密</el-button>
+    										<el-button @click="dialogFormVisible2 = false,resetDig()">取消</el-button>
+    									</el-form-item>
+    								</el-form>.
+    							</el-dialog>
+    						</div>
+
+    						<el-table :data="filelist.slice((currentPage-1)*PageSize,currentPage*PageSize)" stripe style="width: 100%" :model="formData">
+    							<el-table-column prop="picture_name" label="名称" width="120">
+    							</el-table-column>
+    							<el-table-column prop="picture_realname" label="真实名称" width="180">
+    							</el-table-column>
+    							<el-table-column prop="picture_type" label="类型" width="50">
+    							</el-table-column>
+    							<el-table-column prop="picture_user" label="用户" width="120">
+    							</el-table-column>
+    							<el-table-column label="图片" align="center">
+    								<div slot-scope="scope">
+    									<img :src="'./img/'+scope.row.picture_realname+'.'+scope.row.picture_type" @click="handlePictureCardPreviewTable(scope.row)" width="100px" onerror="this.src='./img/丢失.jpg;this.οnerrοr=null'"/>
+    								</div>
+    							</el-table-column>
+    							<el-table-column prop="createtime" label="创建时间">
+    							</el-table-column>
+    							<el-table-column  label="功能" width="300">
+    								<div slot-scope="scope" style="display: flex;justify-content: space-around">
+    									<el-button type="primary" size="mini" @click="handleDownload(scope.row)">下载</el-button>
+
+    									<el-upload
+    											class="upload-demo"
+    											action="#"
+    											:on-change="(file) => {openFile(file, scope.row)}"
+    											:auto-upload="false"
+    											:show-file-list="false"
+    											accept="text/plain"
+    											:limit="1"
+    											:file-list="verifyList"
+    											ref="myVerify"
+    									>
+    										<el-button size="small" type="primary">验证时间戳</el-button>
+    									</el-upload>
+    									<el-button type="primary" size="mini" @click="handleDig(scope.row)">解密签名</el-button>
+    								</div>
+    							</el-table-column>
+    							<el-empty description="暂无信息"></el-empty>
+    						</el-table>
+    						<div class="block">
+    							<el-pagination
+    									@size-change="handleSizeChange"
+    									@current-change="handleCurrentChange"
+    									:current-page="currentPage"
+    									:page-sizes="pageSizes"
+    									:page-size="PageSize"
+    									layout="total, sizes, prev, pager, next, jumper"
+    									:total="totalCount">
+    							</el-pagination>
+    						</div>
+    					</el-main>
+
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script src="./js/axios-0.27.2.js"></script>
+<script type="text/javascript" src="./js/jquery-3.6.0.js"></script>
+<script src="js/javascript/main.js"></script>
+</html>
