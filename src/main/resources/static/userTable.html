@@ -20,6 +20,10 @@
             <el-breadcrumb-item>用户管理</el-breadcrumb-item>
 
         </el-breadcrumb>
+        <div style="float:right;width: 200px;">
+            <el-input placeholder="请输入内容" v-model="search"  @change="sea" class="input-with-select">
+            </el-input>
+        </div>
         <div class="sub">
             <el-table :data="userlist.slice((currentPage-1)*PageSize,currentPage*PageSize)" stripe style="width: 100%" >
                 <el-table-column prop="user_name" label="名称" width="180">

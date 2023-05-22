@@ -10,7 +10,7 @@ import com.hao.digitalsignature.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,7 +22,8 @@ public class UserController {
 
 
     @GetMapping("/user/findAll")
-    public List<User> findAll(){
+    public List<User> findAll(HttpServletResponse response){
+        response.addHeader("Access-Control-Allow-Origin", "*");
         return  userMapper.selectList(null);
     }
 
@@ -33,6 +34,17 @@ public class UserController {
         wrapper.eq("email",email.substring(1,email.length()-1));
         User user = userMapper.selectOne(wrapper);
         return user;
+    }
+    @PostMapping("/user/search")
+    public List<User> search(@RequestBody String str, HttpServletResponse response){
+        System.out.println(str);
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(
+                wrapper ->
+                        wrapper.like("email", str).or().like("realname",str).or().like("user_name",str).or().like("telephone",str).or().like("country",str)
+        );
+        return  userMapper.selectList(queryWrapper);
     }
 
     @PostMapping("/user/save")
@@ -96,15 +108,6 @@ public class UserController {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("email", user.getEmail());
         int i = userMapper.delete(wrapper);
-
-        String fileSaveRootPath ="C:\\ProgramData\\rsk_key\\";
-
-        File file1 = new File(fileSaveRootPath + user.getEmail()+"_rsa_pk.pem");
-        File file2 = new File(fileSaveRootPath + user.getEmail()+"_rsa_sk.pem");
-        File file3 = new File(fileSaveRootPath + user.getEmail()+"_pkcs8_rsa_sk.pem");
-        boolean deleted1 = file1.delete();
-        boolean deleted2 = file2.delete();
-        boolean deleted3 = file3.delete();
         if (i>0)
             return "success";
         else

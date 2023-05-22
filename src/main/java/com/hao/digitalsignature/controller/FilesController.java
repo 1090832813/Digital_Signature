@@ -17,6 +17,7 @@ import com.hao.digitalsignature.entity.Files;
 import com.hao.digitalsignature.mapper.FileMapper;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -74,7 +75,7 @@ public class FilesController {
 
     @PostMapping(value="/file/verify")
     public String verify(@RequestBody String obj) throws Exception {
-
+        System.out.println(obj);
         RSAEncrypt rsaEncrypt=new RSAEncrypt();
         Base64 base64 = new Base64();
         String newobj[] = obj.substring(1,obj.length()-1).split(";");
@@ -177,8 +178,32 @@ public class FilesController {
             return "fail";
     }
 
+    @PostMapping("/file/find")
+    public List<Files> search(@RequestBody String str, HttpServletResponse response){
+        System.out.println(str);
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        QueryWrapper<Files> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(
+                wrapper ->
+                        wrapper.like("picture_name", str).or().like("picture_user",str).or().like("picture_realname",str).or().like("createtime",str)
+        );
+
+        return  fileMapper.selectList(queryWrapper);
+    }
+
+    @PostMapping("/file/selfpic")
+    public List<Files> self(@RequestBody String str, HttpServletResponse response){
+        System.out.println(str);
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        QueryWrapper<Files> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("picture_user",str);
+        return  fileMapper.selectList(queryWrapper);
+    }
+
+
     @GetMapping("/file/findAll")
-    public List<Files> find(){
+    public List<Files> find(HttpServletResponse response){
+        response.addHeader("Access-Control-Allow-Origin", "*");
         return  fileMapper.selectList(null);
     }
 }

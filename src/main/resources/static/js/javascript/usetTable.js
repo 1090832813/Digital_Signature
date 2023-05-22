@@ -3,6 +3,7 @@ new Vue({
     data(){
         return {
             userlist:[],
+            search:'',
             // 默认显示第几页
             currentPage:1,
             // 总条数，根据接口获取数据长度(注意：这里不能为空)
@@ -32,7 +33,19 @@ new Vue({
         },
         pubkey(str){
             return (str||"").split(";")[0]
-        }
+        },
+        sea(){
+            let that = this
+            if(this.search=='')
+                this.init()
+            else {
+                axios.post("/user/search",this.search,{headers: { 'Content-Type': 'text/plain'}}).then(res=>{
+                    that.userlist = res.data
+                    that.totalCount=res.data.length
+                })
+            }
+
+        },
     },
     mounted() {
         this.init();

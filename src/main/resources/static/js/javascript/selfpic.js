@@ -36,6 +36,71 @@ new Vue({
         }
     },
     methods: {
+        //弹出添加窗口
+        handleCreate() {
+            this.resetForm();
+            this.dialogFormVisible = true;
+        },
+        handlePicturePreview(file) {
+            console.log(file)
+            console.log(6)
+            this.par=file.raw;
+            const isLt2M = file.size / 1024 / 1024 < 10;
+
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 10MB!');
+                this.clearFiles();
+                return isLt2M;
+            }
+
+        },
+        handlePictureCardPreview(file) {
+            this.dialogImageUrl = file.url;
+
+            this.dialogVisible = true;
+        },
+        ifLogin(){
+            if(Cookies.get('email')==undefined){
+                return false
+            }else {
+                return Cookies.get('email')
+            }
+        },
+        handleEdit() {
+            let that = this
+            if(this.ifLogin()) {
+                const _file = this.par;
+                // 通过 FormData 对象上传文件
+                var formData = new FormData();
+                formData.append("file", _file);
+                this.formData.picture_user= this.ifLogin();
+                console.log(this.formData)
+                axios.post("/file/upload", formData).then((res) => {
+                    this.formData.picture_realname = res.data.split(".")[0]
+                    this.formData.picture_type = res.data.split(".")[1]
+                    axios.post("/file/save", this.formData).then((result) => {
+                        this.resetForm();
+                        this.dialogFormVisible = false;
+                        this.clearFiles()
+                    }).then(function () {
+                        that.init()
+                    });
+                })
+            }else {
+                this_vue.$alert('还未登录','警告', {
+                    confirmButtonText: '确定',
+                });
+            }
+
+        },
+        resetForm() {
+            this.formData = {};
+            //this.$refs['myDig'].clearValidate();
+            this.$nextTick(() => {
+                this.$refs.mYupload.clearFiles()
+            })
+
+        },
         sea(){
             let that = this
             if(this.search=='')
@@ -112,7 +177,8 @@ new Vue({
 
         init(){
             const that = this
-            axios.get("/file/findAll", this.formData, ).then((result) => {
+            console.log(Cookies.get("email"))
+            axios.post("/file/selfpic", Cookies.get("email"), {headers: { 'Content-Type': 'text/plain'}}).then((result) => {
 
                 that.filelist = result.data
                 that.totalCount=result.data.length

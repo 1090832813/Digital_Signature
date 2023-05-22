@@ -34,13 +34,19 @@ new Vue({
             menuList:[
                 {
                     "path": "1",
-                    "title": "图片版权管理",
+                      "title": "图片版权管理",
                     "icon":"fa-dashboard",
                     "children": [
                         {
                             "path": "/1-1",
                             "title": "图片管理",
                             "linkUrl":"main.html",
+                            "children":[]
+                        },
+                        {
+                            "path": "/1-2",
+                            "title": "个人图片",
+                            "linkUrl":"selfpic.html",
                             "children":[]
                         }
                     ]
@@ -226,12 +232,6 @@ new Vue({
         },
 
         init(){
-            // const that = this
-            // axios.get("/file/findAll", this.formData, ).then((result) => {
-            //
-            //     that.filelist = result.data
-            //     that.totalCount=result.data.length
-            // });
             let nav =document.querySelector(".nav")
             console.log(Cookies.get('email')==undefined)
             if(Cookies.get('email')!=undefined){
@@ -242,6 +242,78 @@ new Vue({
                 nav.innerHTML = `<a href="Login.html" class="rl" >登录</a>
                                 <span> / </span>
                                 <a href="Reg.html" class="rl" >注册</a>`
+            }
+            if(Cookies.get('email')=='admin'){
+                this.menuList=[
+                    {
+                        "path": "1",
+                        "title": "图片版权管理",
+                        "icon":"fa-dashboard",
+                        "children": [
+                            {
+                                "path": "/1-1",
+                                "title": "图片管理",
+                                "linkUrl":"main.html",
+                                "children":[]
+                            }
+                        ]
+                    },
+                    {
+                        "path": "2",
+                        "title": "系统管理",
+                        "icon":"fa-user-md",
+                        "children": [
+                            {
+                                "path": "/2-1",
+                                "title": "用户管理",
+                                "linkUrl":"userTable.html",
+                                "children":[]
+                            },{
+                                "path": "/2-2",
+                                "title": "图片管理",
+                                "linkUrl":"picTable.html",
+                                "children":[]
+                            }
+                        ]
+                    }
+                ]
+                console.log('admin')
+            }else{
+                this.menuList=[
+                    {
+                        "path": "1",
+                        "title": "图片版权管理",
+                        "icon":"fa-dashboard",
+                        "children": [
+                            {
+                                "path": "/1-1",
+                                "title": "图片管理",
+                                "linkUrl":"main.html",
+                                "children":[]
+                            },
+                            {
+                                "path": "/1-2",
+                                "title": "个人图片",
+                                "linkUrl":"selfpic.html",
+                                "children":[]
+                            }
+                        ]
+                    },
+                    {
+                        "path": "2",
+                        "title": "系统管理",
+                        "icon":"fa-user-md",
+                        "children": [
+                            {
+                                "path": "/2-1",
+                                "title": "个人信息",
+                                "linkUrl":"selfmsg.html",
+                                "children":[]
+                            }
+                        ]
+                    }
+                ]
+                console.log('user')
             }
         },
         quit(){
@@ -349,33 +421,7 @@ new Vue({
             this.rname=null;
             this.resetDig();
         },
-        handleEdit() {
-            let that = this
-            if(this.ifLogin()) {
-                const _file = this.par;
-                // 通过 FormData 对象上传文件
-                var formData = new FormData();
-                formData.append("file", _file);
-                this.formData.picture_user= this.ifLogin();
-                console.log(this.formData)
-                axios.post("/file/upload", formData).then((res) => {
-                    this.formData.picture_realname = res.data.split(".")[0]
-                    this.formData.picture_type = res.data.split(".")[1]
-                    axios.post("/file/save", this.formData).then((result) => {
-                        this.resetForm();
-                        this.dialogFormVisible = false;
-                        this.clearFiles()
-                    }).then(function () {
-                        that.init()
-                    });
-                })
-            }else {
-                this_vue.$alert('还未登录','警告', {
-                    confirmButtonText: '确定',
-                });
-            }
 
-        },
         ifLogin(){
             if(Cookies.get('email')==undefined){
                 return false

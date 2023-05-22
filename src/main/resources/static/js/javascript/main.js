@@ -11,6 +11,7 @@ new Vue({
             verify:{},
             verifyList:[],
             formData: {},
+            search:'',
             dialogFormVisible:false,
             dialogFormVisible2:false,
             dialogFormVisible4Edit: false,
@@ -35,6 +36,18 @@ new Vue({
         }
     },
     methods: {
+        sea(){
+            let that = this
+            if(this.search=='')
+                this.init()
+            else {
+                axios.post("/file/find",this.search,{headers: { 'Content-Type': 'text/plain'}}).then(res=>{
+                that.filelist = res.data
+                that.totalCount=res.data.length
+                })
+            }
+
+        },
         // 每页显示的条数
         handleSizeChange(val) {
             // 改变每页显示的条数
@@ -55,30 +68,14 @@ new Vue({
         handleClose(key, keyPath) {
             console.log(key, keyPath);
         },
-        handlePicturePreview(file) {
-            console.log(file)
-            console.log(6)
-            this.par=file.raw;
-            const isLt2M = file.size / 1024 / 1024 < 10;
 
-            if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 10MB!');
-                this.clearFiles();
-                return isLt2M;
-            }
-
-        },
         handlePreview(file) {
             console.log(file);
         },
 
 
 
-        handlePictureCardPreview(file) {
-            this.dialogImageUrl = file.url;
 
-            this.dialogVisible = true;
-        },
         handlePictureCardPreviewTable(file) {
 
             this.dialogImageUrl =window.document.location.href+'./img/'+file.picture_realname+'.'+file.picture_type;
@@ -88,20 +85,23 @@ new Vue({
         handleDownload(file) {
             let f =file.picture_realname+"."+file.picture_type
             axios.post("/file/download",f,).then((result)=>{
-                var url = (window.document.location.href+"img/"+result.config.data)
+                var url = ("http://localhost:8081/img/"+result.config.data)
                 var that = this
                 var fileName = file.picture_name
+                console.log(fileName)
                 this.convertUrlToBase64(url).then(function (base64) {
                     var blob = that.convertBase64UrlToBlob(base64); // 转为blob对象
                     // 下载
                     if (that.myBrowser() == "IE") {
                         window.navigator.msSaveBlob(blob, fileName + ".png");
+                        console.log(blob)
                     } else if (that.myBrowser() == "FF") {
                         window.location.href = url;
                     } else {
                         var a = document.createElement("a");
                         a.download = fileName;
                         a.href = URL.createObjectURL(blob);
+                        console.log(a.href)
                         document.body.appendChild(a)
                         a.click();
                         URL.revokeObjectURL(a.href) // 释放URL 对象
@@ -121,6 +121,7 @@ new Vue({
             var blob = new Blob([data]);
             var downloadElement = document.createElement('a');
             var href = window.URL.createObjectURL(blob);
+
             downloadElement.href = href;
             downloadElement.download = fileName;
             document.body.appendChild(downloadElement);
@@ -217,7 +218,7 @@ new Vue({
         },
         //重置解密
         resetDig() {
-            this.digList = {};
+            this.digList = [];
 
             this.$nextTick(() => {
                 this.$refs.myDig.clearFiles()
@@ -225,17 +226,13 @@ new Vue({
         },
         //重置验证
         resetDig() {
-            this.verifyList = {};
+            this.verifyList = [];
 
             this.$nextTick(() => {
                 this.$refs.myVerify.clearFiles()
             })
         },
-        //弹出添加窗口
-        handleCreate() {
-            this.resetForm();
-            this.dialogFormVisible = true;
-        },
+
         uploadDig(file){
             this.dig=file.raw;
         },
@@ -243,6 +240,7 @@ new Vue({
             this.rname=file.picture_realname;
             this.resetDig();
             this.dialogFormVisible2 = true;
+            console.log(this.dialogFormVisible2)
         },
         handleVerify() {
             this.resetForm();
@@ -258,7 +256,7 @@ new Vue({
                     //打印文件内容
                     console.log(reader.result);
                     var p= name.picture_id+";"+Cookies.get('email')+';'+ reader.result
-
+                    console.log("p是："+p)
                     axios.post("/file/verify", p,{headers: { 'Content-Type': 'application/json','data': 'JSON.stringify(Data)'}}).then((res) => {
                         if(res.data!=0){
                             this_vue.$alert('AES密钥(请复制):'+res.data,'验证成功', {
@@ -307,40 +305,8 @@ new Vue({
             this.rname=null;
             this.resetDig();
         },
-        handleEdit() {
-            let that = this
-            if(this.ifLogin()) {
-                const _file = this.par;
-                // 通过 FormData 对象上传文件
-                var formData = new FormData();
-                formData.append("file", _file);
-                this.formData.picture_user= this.ifLogin();
-                console.log(this.formData)
-                axios.post("/file/upload", formData).then((res) => {
-                    this.formData.picture_realname = res.data.split(".")[0]
-                    this.formData.picture_type = res.data.split(".")[1]
-                    axios.post("/file/save", this.formData).then((result) => {
-                        this.resetForm();
-                        this.dialogFormVisible = false;
-                        this.clearFiles()
-                    }).then(function () {
-                        that.init()
-                    });
-                })
-            }else {
-                this_vue.$alert('还未登录','警告', {
-                    confirmButtonText: '确定',
-                });
-            }
 
-        },
-        ifLogin(){
-            if(Cookies.get('email')==undefined){
-                return false
-            }else {
-                return Cookies.get('email')
-            }
-        }
+
     },
     mounted() {
         this.init();

@@ -75,6 +75,7 @@ public class FileDealController {
                                 HttpServletResponse response) {
         // 得到要下载的文件名
         fileName = fileName.substring(0,fileName.length()-1);
+
         try {
 
             //下载图片
@@ -171,6 +172,7 @@ public class FileDealController {
             System.out.println(rsaMsg);
         byte[] rsaEnf=RSAEncrypt.RSAen(rsaMsg.substring(0,rsaMsg.length()/2),downloadUser);
         byte[] rsaEns=RSAEncrypt.RSAen(rsaMsg.substring(rsaMsg.length()/2),downloadUser);
+
         Base64 base64 = new Base64();
         String cipherf = new String(base64.encode(rsaEnf));
         String ciphers = new String(base64.encode(rsaEns));

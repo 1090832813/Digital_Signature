@@ -15,11 +15,23 @@
 <div id="app">
     <el-main>
         <el-breadcrumb separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item  :to="{ path: '/' }"><a href="index.html">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item  :to="{ path: '/' }"><a href="main.html">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item  :to="{ path: '/' }">系统管理</el-breadcrumb-item>
             <el-breadcrumb-item>个人信息</el-breadcrumb-item>
-
         </el-breadcrumb>
-        <div class="msg">
+        <el-button id="change" size="small" type="primary" @click="dialogFormVisible=true">修改信息</el-button>
+        <el-form :label-position="labelPosition" label-width="80px" :model="formData">
+            <el-descriptions title="个人信息" direction="vertical" :column="4" border >
+                <el-descriptions-item label="用户名" :span="0.5">{{formData.user_name}}</el-descriptions-item>
+                <el-descriptions-item label="真实姓名" :span="0.5">{{formData.realname}}</el-descriptions-item>
+                <el-descriptions-item label="居住地" :span="1">{{formData.country}}</el-descriptions-item>
+                <el-descriptions-item label="电子邮箱" :span="2">{{formData.email}}</el-descriptions-item>
+                <el-descriptions-item label="电话号码" :span="2">{{formData.telephone}}</el-descriptions-item>
+                <el-descriptions-item label="签名公钥" :span="2">{{(formData.dsakey||'').split(';')[3]}}</el-descriptions-item>
+                <el-descriptions-item label="签名私钥" :span="4">{{(formData.dsakey||'').split(';')[4]}}</el-descriptions-item>
+            </el-descriptions>
+        </el-form>
+        <el-dialog title="修改信息" :visible.sync="dialogFormVisible">
             <el-form :label-position="labelPosition" label-width="80px" :model="formData">
                 <el-form-item label="用户名">
                     <el-input v-model="formData.user_name"></el-input>
@@ -46,8 +58,7 @@
                     <el-button type="primary" @click="updateMsg()">更新个人信息</el-button>
                 </el-form-item>
             </el-form>
-
-        </div>
+        </el-dialog>
     </el-main>
 </div>
 

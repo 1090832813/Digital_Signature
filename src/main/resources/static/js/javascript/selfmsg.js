@@ -3,6 +3,7 @@ new Vue({
     data(){
         return{
             labelPosition: 'right',
+            dialogFormVisible:false,
             formData:{},
             path:'index.html'
         }
@@ -26,6 +27,7 @@ new Vue({
                 }else if(result.data=="exist"){
                     that.open4()
                 }
+                that.dialogFormVisible=false
             })
         },
         open2() {
