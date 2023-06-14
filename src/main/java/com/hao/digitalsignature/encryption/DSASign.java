@@ -40,7 +40,9 @@ public class DSASign {
     }
     //生成公钥私钥
     public String initKeys(){
-        q = new BigInteger(160, 100, new SecureRandom());
+        do {
+            q = new BigInteger(160, 100, new SecureRandom());
+        }while(!q.isProbablePrime(100));
         // 判定100%为素数
         do {
             BigInteger t = new BigInteger(512, new SecureRandom());
@@ -128,90 +130,6 @@ public class DSASign {
 //        // 验证c是否等于a*2^|b|+b
 //        System.out.println("c == a * Math.pow(2, Math.abs(b)) + b ? " + (c == a * Math.pow(2, Math.abs(b)) + b));
 //
-//    }
-public static String generateCode(int Nbites, int count) {
-    Random random = new Random();
-    int c = random.nextInt((int)Math.pow(2, Nbites));
-    int halfNbites = Nbites / 2;
-    int a = c >>> halfNbites;
-    int b = c & ((1 << halfNbites) - 1);
-    if (c == a * (int)Math.pow(2, Math.abs(b)) + b) {
-        if (Integer.toBinaryString(a).length() == halfNbites && Integer.toBinaryString(a).charAt(0) == '1' &&
-                Integer.toBinaryString(b).length() == halfNbites && Integer.toBinaryString(b).charAt(0) == '1') {
-            return "随机生成的整数c为" + c + "\n" +
-                    "拆分后的整数a为" + a + "\n" +
-                    "拆分后的整数b为" + b + "\n" +
-                    "满足条件c=a*2^|b|+b";
-        } else {
-            if (count < 10000) { // 设置递归次数上限为10000
-                return generateCode(Nbites, count + 1);
-            } else {
-                return "无法找到符合条件的a和b";
-            }
-        }
-    } else {
-        if (count < 10000) {
-            return generateCode(Nbites, count + 1);
-        } else {
-            return "无法找到符合条件的a和b";
-        }
-    }
-}
-
-
-    public static String generateCode(int Nbites) {
-        Random random = new Random();
-        int count = 0;
-        while (count < 10000) { // 设置最大循环次数为10000
-            int c = random.nextInt((int)Math.pow(2, Nbites));
-            int halfNbites = Nbites / 2;
-            int a = c >>> halfNbites;
-            int b = c & ((1 << halfNbites) - 1);
-            if (c == a * (int)Math.pow(2, Math.abs(b)) + b) {
-                if (Integer.toBinaryString(a).length() == halfNbites && Integer.toBinaryString(a).charAt(0) == '1' &&
-                        Integer.toBinaryString(b).length() == halfNbites && Integer.toBinaryString(b).charAt(0) == '1') {
-                    return "随机生成的整数c为" + c + "\n" +
-                            "拆分后的整数a为" + a + "\n" +
-                            "拆分后的整数b为" + b + "\n" +
-                            "满足条件c=a*2^|b|+b";
-                }
-            }
-            count++;
-        }
-        return "无法找到符合条件的a和b";
-    }
-
-    public static void main(String[] args) {
-        System.out.println(generateCode(8));
-    }
-//    public static void main(String args[]) throws Exception {
-//        String publicPath = "C:\\Users\\10908"; //公匙存放位置
-//        String privatePath = "C:\\Users\\10908"; //私匙存放位置
-//        BigInteger back[]=new BigInteger[2];
-//        int j=0;
-//        Base64 base64 = new Base64();
-//        DSASign dsa = new DSASign();
-//
-//        //生成公钥和私钥
-//        dsa.initKeys();
-//        System.out.println("");
-//        //要签名的数据，传入AES加密后的内容
-//        String message = "NUJCQkJEQjRCRDBFODMwRTJCODkyOTQ1N0Y4NkEyNzU=";
-//        System.out.println("签名的数据："+message);
-//        BigInteger sig[] = dsa.signature(message.getBytes(), );
-//
-//        //消息摘要
-//        System.out.println("消息摘要："+dsa._hashInZq(message.getBytes())+"\n");
-//
-//        //对消息摘要进行签名得到r和s,在使用RSA进行加密并发送
-//        for (int i =0;i< sig.length;i++){
-//        System.out.println("签名:"+sig[i].toString());
-//         back[i]= new BigInteger(RSAEncrypt.RSAen(sig[i].toString()));
-//        }
-//        System.out.println("\n需要解密的信息:"+back[0]);
-//        System.out.println("           "+back[1]);
-//
-//        System.out.println("验证结果:" + dsa.verify(message.getBytes(),back) );
 //    }
 
 }
