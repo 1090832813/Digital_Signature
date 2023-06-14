@@ -91,6 +91,8 @@ public class FilesController {
           System.out.println(str[i]);
         Files file = fileMapper.selectById(str[0]);
         System.out.println(file);
+        System.out.println(str[4]);
+        System.out.println(file.getCreatetime());
         if(file.getCreatetime().equals( str[4])){
             System.out.println("success");
             QueryWrapper<Download> queryWrapper = new QueryWrapper<>();

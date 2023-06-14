@@ -41,8 +41,10 @@ new Vue({
             if(this.search=='')
                 this.init()
             else {
+                console.log(this.search)
                 axios.post("/file/find",this.search,{headers: { 'Content-Type': 'text/plain'}}).then(res=>{
-                that.filelist = res.data
+                console.log(res.data)
+                    that.filelist = res.data
                 that.totalCount=res.data.length
                 })
             }
@@ -72,13 +74,8 @@ new Vue({
         handlePreview(file) {
             console.log(file);
         },
-
-
-
-
         handlePictureCardPreviewTable(file) {
-
-            this.dialogImageUrl =window.document.location.href+'./img/'+file.picture_realname+'.'+file.picture_type;
+            this.dialogImageUrl ='../../../../img/'+file.picture_realname+'.'+file.picture_type;
             console.log(this.dialogImageUrl)
             this.dialogVisible = true;
         },

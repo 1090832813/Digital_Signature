@@ -22,7 +22,9 @@
 
         </el-breadcrumb>
 
-
+        <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
 		<div style="float:right;width: 200px;">
 			<el-input placeholder="请输入内容" v-model="search"  @change="sea" class="input-with-select">
 			</el-input>

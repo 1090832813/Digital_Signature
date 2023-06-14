@@ -48,12 +48,7 @@
                 <el-form-item label="国家">
                     <el-input v-model="formData.country"></el-input>
                 </el-form-item>
-                <el-form-item label="签名私钥">
-                    <el-input v-model="(formData.dsakey||'').split(';')[3]" readonly></el-input>
-                </el-form-item>
-                <el-form-item label="签名公钥">
-                    <el-input v-model="(formData.dsakey||'').split(';')[4]" readonly></el-input>
-                </el-form-item>
+                
                 <el-form-item label="">
                     <el-button type="primary" @click="updateMsg()">更新个人信息</el-button>
                 </el-form-item>

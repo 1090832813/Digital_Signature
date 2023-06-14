@@ -55,7 +55,8 @@ public class FileDealController {
                 File file = new File("");
                 String filePath = file.getCanonicalPath();
 //                pic.transferTo(new File("../pic",newName));
-                pic.transferTo(new File(filePath+"\\src\\main\\resources\\static\\img",newName));
+                System.out.println("路径"+filePath);
+                pic.transferTo(new File(filePath+"\\img",newName));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -82,7 +83,7 @@ public class FileDealController {
             File filep = new File("");
             String filePath = filep.getCanonicalPath();
             // 上传位置
-            String fileSaveRootPath =filePath+"\\src\\main\\resources\\static\\img";
+            String fileSaveRootPath =filePath+"\\img";
 
             System.out.println(fileSaveRootPath + "\\" + fileName);
             // 得到要下载的文件

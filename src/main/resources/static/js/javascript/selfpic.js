@@ -166,20 +166,14 @@ new Vue({
         },
         handlePictureCardPreviewTable(file) {
 
-            this.dialogImageUrl =window.document.location.href+'./img/'+file.picture_realname+'.'+file.picture_type;
+            this.dialogImageUrl ='../../../../img/'+file.picture_realname+'.'+file.picture_type;
             console.log(this.dialogImageUrl)
             this.dialogVisible = true;
         },
-
-
-
-
-
         init(){
             const that = this
             console.log(Cookies.get("email"))
             axios.post("/file/selfpic", Cookies.get("email"), {headers: { 'Content-Type': 'text/plain'}}).then((result) => {
-
                 that.filelist = result.data
                 that.totalCount=result.data.length
             });
