@@ -9,6 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MyPicConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/img/**").addResourceLocations("file:C:\\Users\\w10\\Desktop\\digitalsignature\\img/");
+        registry.addResourceHandler("/img/**").addResourceLocations("file:C:\\Users\\10908\\Desktop\\digitalsignature\\img/");
     }
 }
